@@ -2,7 +2,7 @@
 
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
-## v3.2.8 (11/03/2019)
+## v3.1.0 (11/03/2019)
 
  - Build v3.2.8
  - Significant memory improvements
