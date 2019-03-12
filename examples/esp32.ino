@@ -20,8 +20,8 @@
 
   ----------------------------------------------------------------------------*/
 #include <driver/i2s.h>
-#include <chirp_connect.h>
 
+#include "chirp_connect.h"
 #include "credentials.h"
 
 #define I2SI_DATA         12     // I2S DATA IN on GPIO32
@@ -53,14 +53,14 @@ static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
 static volatile bool buttonPressed = false;
 static bool startTasks = false;
 
-// Function definitions ---------------------------------------
+// Function declarations --------------------------------------
 void IRAM_ATTR handleInterrupt();
 void setupChirp();
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioInput(int sample_rate);
 void setupAudioOutput(int sample_rate);
 
-// Function declarations --------------------------------------
+// Function definitions ---------------------------------------
 void
 onStateChangedCallback(void *connect, chirp_connect_state_t previous, chirp_connect_state_t current)
 {
