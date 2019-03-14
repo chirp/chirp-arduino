@@ -14,8 +14,8 @@
 
 #error("Add your credentials below (from https://developers.chirp.io) and delete this line.")
 
-#define APP_KEY        "YOUR_APP_KEY"
-#define APP_SECRET     "YOUR_APP_SECRET"
-#define APP_CONFIG     "YOUR_APP_CONFIG"
+#define CHIRP_APP_KEY        "YOUR_APP_KEY"
+#define CHIRP_APP_SECRET     "YOUR_APP_SECRET"
+#define CHIRP_APP_CONFIG     "YOUR_APP_CONFIG"
 
 #endif /* Credentials_h */

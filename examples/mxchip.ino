@@ -6,7 +6,7 @@
  *
  *  @brief After creating a developer account on https://developers.chirp.io, get
  *  your key, secret and config string from your account using the "16kHz"
- *  protocol, and set them in this file (in APP_KEY, APP_SECRET, APP_CONFIG).
+ *  protocol, and set them in this file (in CHIRP_APP_KEY, CHIRP_APP_SECRET, CHIRP_APP_CONFIG).
  *
  *  This example will start in listening mode. The listening and playing modes
  *  can alternate by pressing the button A (on the left).
@@ -204,7 +204,7 @@ void setup()
     pinMode(USER_BUTTON_A, INPUT);
     lastButtonAState = digitalRead(USER_BUTTON_A);
 
-    chirpConnect = new_chirp_connect(APP_KEY, APP_SECRET);
+    chirpConnect = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
     if (chirpConnect)
     {
         printf("Initialisation is OK\n");
@@ -215,7 +215,7 @@ void setup()
         exit(1);
     }
 
-    chirp_connect_error_code_t errorCode = chirp_connect_set_config(chirpConnect, APP_CONFIG);
+    chirp_connect_error_code_t errorCode = chirp_connect_set_config(chirpConnect, CHIRP_APP_CONFIG);
     errorHandler(errorCode);
 
     printf("Licence set correctly\n");
