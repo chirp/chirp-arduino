@@ -53,14 +53,14 @@ static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
 static volatile bool buttonPressed = false;
 static bool startTasks = false;
 
-// Function declarations --------------------------------------
+// Function definitions ---------------------------------------
 void IRAM_ATTR handleInterrupt();
 void setupChirp();
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioInput(int sample_rate);
 void setupAudioOutput(int sample_rate);
 
-// Function definitions ---------------------------------------
+// Function declarations --------------------------------------
 void
 onStateChangedCallback(void *connect, chirp_connect_state_t previous, chirp_connect_state_t current)
 {
@@ -204,13 +204,13 @@ IRAM_ATTR handleInterrupt()
 void
 setupChirp()
 {
-  connect = new_chirp_connect(APP_KEY, APP_SECRET);
+  connect = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (connect == NULL) {
     Serial.println("Chirp initialisation failed.");
     return;
   }
 
-  chirp_connect_error_code_t err = chirp_connect_set_config(connect, APP_CONFIG);
+  chirp_connect_error_code_t err = chirp_connect_set_config(connect, CHIRP_APP_CONFIG);
   if (err != CHIRP_CONNECT_OK)
     chirpErrorHandler(err);
 
