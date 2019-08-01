@@ -181,7 +181,7 @@ void setup()
   if (err != CHIRP_CONNECT_OK)
     chirpErrorHandler(err);
 
-  stat = dma.startJob();
+  ZeroDMAstatus stat = dma.startJob();
   if (stat != DMA_STATUS_OK)
   {
     dma.printStatus(stat);
