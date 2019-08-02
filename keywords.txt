@@ -1,0 +1,110 @@
+#######################################
+# Syntax Coloring Map For ChirpSDK
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+new_chirp_connect				KEYWORD2
+del_chirp_connect				KEYWORD2
+chirp_connect_free				KEYWORD2
+chirp_connect_set_config		KEYWORD2
+chirp_connect_get_info			KEYWORD2
+chirp_connect_set_callbacks		KEYWORD2
+chirp_connect_start				KEYWORD2
+chirp_connect_stop				KEYWORD2
+chirp_connect_get_max_payload_length			KEYWORD2
+chirp_connect_get_duration_for_payload_length	KEYWORD2
+chirp_connect_is_valid			KEYWORD2
+chirp_connect_random_payload	KEYWORD2
+chirp_connect_as_string			KEYWORD2
+chirp_connect_send				KEYWORD2
+chirp_connect_process			KEYWORD2
+chirp_connect_process_input		KEYWORD2
+chirp_connect_process_output	KEYWORD2
+chirp_connect_process_shorts	KEYWORD2
+chirp_connect_process_shorts_input		KEYWORD2
+chirp_connect_process_shorts_output		KEYWORD2
+chirp_connect_get_state_for_channel		KEYWORD2
+chirp_connect_get_transmission_channel	KEYWORD2
+chirp_connect_set_transmission_channel	KEYWORD2
+chirp_connect_get_channel_count			KEYWORD2
+chirp_connect_get_state			KEYWORD2
+chirp_connect_get_volume		KEYWORD2
+chirp_connect_set_volume		KEYWORD2
+chirp_connect_get_input_sample_rate		KEYWORD2
+chirp_connect_get_output_sample_rate	KEYWORD2
+chirp_connect_set_input_sample_rate		KEYWORD2
+chirp_connect_set_output_sample_rate	KEYWORD2
+chirp_connect_get_auto_mute				KEYWORD2
+chirp_connect_set_auto_mute				KEYWORD2
+chirp_connect_set_callback_ptr			KEYWORD2
+chirp_connect_set_frequency_correction	KEYWORD2
+chirp_connect_get_version				KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+chirp_connect_error_code_t		KEYWORD1	DATA_TYPE
+chirp_connect_callback_t		KEYWORD1	DATA_TYPE
+chirp_connect_state_callback_t	KEYWORD1	DATA_TYPE
+chirp_connect_state_callback_t	KEYWORD1	DATA_TYPE
+chirp_connect_state_t			KEYWORD1	DATA_TYPE
+
+CHIRP_CONNECT_STATE_NOT_CREATED			LITERAL1
+CHIRP_CONNECT_STATE_STOPPED				LITERAL1
+CHIRP_CONNECT_STATE_RUNNING				LITERAL1
+CHIRP_CONNECT_STATE_SENDING				LITERAL1
+CHIRP_CONNECT_STATE_RECEIVING			LITERAL1
+
+CHIRP_CONNECT_OK						LITERAL1
+CHIRP_CONNECT_OUT_OF_MEMORY				LITERAL1
+CHIRP_CONNECT_NOT_INITIALISED			LITERAL1
+CHIRP_CONNECT_INTERNAL_ERROR			LITERAL1
+
+CHIRP_CONNECT_NOT_RUNNING				LITERAL1
+CHIRP_CONNECT_ALREADY_RUNNING			LITERAL1
+CHIRP_CONNECT_ALREADY_STOPPED			LITERAL1
+CHIRP_CONNECT_ALREADY_SENDING			LITERAL1
+
+CHIRP_CONNECT_INVALID_SAMPLE_RATE		LITERAL1
+CHIRP_CONNECT_NULL_BUFFER				LITERAL1
+CHIRP_CONNECT_NULL_POINTER				LITERAL1
+CHIRP_CONNECT_CHANNEL_NOT_SUPPORTED		LITERAL1
+CHIRP_CONNECT_INVALID_FREQUENCY_CORRECTION		LITERAL1
+CHIRP_CONNECT_PROCESSING_ERROR			LITERAL1
+
+CHIRP_CONNECT_INVALID_KEY				LITERAL1
+CHIRP_CONNECT_INVALID_SECRET			LITERAL1
+CHIRP_CONNECT_INVALID_CREDENTIALS		LITERAL1
+CHIRP_CONNECT_MISSING_SIGNATURE			LITERAL1
+CHIRP_CONNECT_INVALID_SIGNATURE			LITERAL1
+CHIRP_CONNECT_MISSING_CONFIG			LITERAL1
+CHIRP_CONNECT_INVALID_CONFIG			LITERAL1
+CHIRP_CONNECT_EXPIRED_CONFIG			LITERAL1
+CHIRP_CONNECT_INVALID_VERSION			LITERAL1
+CHIRP_CONNECT_INVALID_PROJECT			LITERAL1
+
+CHIRP_CONNECT_INVALID_CONFIG_CHARACTER	LITERAL1
+
+CHIRP_CONNECT_PAYLOAD_EMPTY_MESSAGE		LITERAL1
+CHIRP_CONNECT_PAYLOAD_INVALID_MESSAGE	LITERAL1
+CHIRP_CONNECT_PAYLOAD_UNKNOWN_SYMBOLS	LITERAL1
+CHIRP_CONNECT_PAYLOAD_DECODE_FAILED		LITERAL1
+CHIRP_CONNECT_PAYLOAD_TOO_LONG			LITERAL1
+CHIRP_CONNECT_PAYLOAD_TOO_SHORT			LITERAL1
+
+CHIRP_CONNECT_INVALID_VOLUME			LITERAL1
+CHIRP_CONNECT_UNKNOWN_ERROR				LITERAL1
+
+CHIRP_CONNECT_NETWORK_ERROR				LITERAL1
+CHIRP_CONNECT_NETWORK_NO_NETWORK		LITERAL1
+CHIRP_CONNECT_NETWORK_PERMISSIONS_NOT_GRANTED		LITERAL1
+CHIRP_CONNECT_ACCOUNT_DISABLED			LITERAL1
+CHIRP_CONNECT_AUDIO_IO_ERROR			LITERAL1
+CHIRP_CONNECT_SENDING_NOT_ENABLED		LITERAL1
+CHIRP_CONNECT_RECEIVING_NOT_ENABLED		LITERAL1
+CHIRP_CONNECT_DEVICE_IS_MUTED			LITERAL1
