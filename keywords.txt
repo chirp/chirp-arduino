@@ -48,6 +48,12 @@ chirp_connect_get_version				KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
+chirp_connect_error_code_t		KEYWORD1	DATA_TYPE
+chirp_connect_callback_t		KEYWORD1	DATA_TYPE
+chirp_connect_state_callback_t	KEYWORD1	DATA_TYPE
+chirp_connect_state_callback_t	KEYWORD1	DATA_TYPE
+chirp_connect_state_t			KEYWORD1	DATA_TYPE
+
 CHIRP_CONNECT_STATE_NOT_CREATED			LITERAL1
 CHIRP_CONNECT_STATE_STOPPED				LITERAL1
 CHIRP_CONNECT_STATE_RUNNING				LITERAL1
