@@ -24,8 +24,7 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define NUM_BUFFERS            8
-#define BUFFER_SIZE            1024
+#define BUFFER_SIZE            256
 #define OUTPUT_SAMPLE_RATE     16667
 
 #define I2S_SCK_PIN            23  // D7
@@ -35,8 +34,10 @@
 // Global variables ------------------------------------------------------------
 
 static chirp_connect_t *chirp = NULL;
-int16_t data[NUM_BUFFERS][BUFFER_SIZE];
-uint8_t next, current;
+uint8_t current;
+short *current_buffer;
+short buffer_one[BUFFER_SIZE];
+short buffer_two[BUFFER_SIZE];
 
 // Function definitions --------------------------------------------------------
 
@@ -65,15 +66,17 @@ void loop()
 {
   if (NRF_I2S->EVENTS_TXPTRUPD != 0)
   {
-    // Transfer is complete, start it with the preprocessed data
-    current = (current + 1) % NUM_BUFFERS;
-    NRF_I2S->TXD.PTR = (uint32_t)(data[current]);
-    NRF_I2S->EVENTS_TXPTRUPD = 0;
-
-    // Process next buffer
-    next = (current + 1) % NUM_BUFFERS;
-    chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, data[next], BUFFER_SIZE);
+    if (current == 0) {
+      current_buffer = buffer_one;
+      current = 1;
+    } else {
+      current_buffer = buffer_two;
+      current = 0;
+    }
+    chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, current_buffer, BUFFER_SIZE);
     chirpErrorHandler(err);
+    NRF_I2S->TXD.PTR = (uint32_t)(current_buffer);
+    NRF_I2S->EVENTS_TXPTRUPD = 0;
   }
 }
 
@@ -197,7 +200,7 @@ i2s_start()
   NRF_I2S->ENABLE = 1;
 
   // Configure DMA buffer
-  NRF_I2S->TXD.PTR = (uint32_t)(data[current]);
+  NRF_I2S->TXD.PTR = (uint32_t)(buffer_one);
   NRF_I2S->RXTXD.MAXCNT = BUFFER_SIZE / 2;
 
   NRF_I2S->TASKS_START = 1;
