@@ -78,6 +78,7 @@ loop()
     chirp_connect_send(chirp, payload, payloadLength);
     Serial.println("Sending data...");
     buttonPressed = false;
+    chirp_connect_free(payload);
   }
 }
 
