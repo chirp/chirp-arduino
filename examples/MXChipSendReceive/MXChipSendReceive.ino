@@ -2,7 +2,7 @@
  *
  *  Simple example of the Chirp C SDK on the Microsoft MXChip IoT DevKit.
  *
- *  @file mxchip.ino
+ *  @file MXChipSendReceive.ino
  *
  *  @brief After creating a developer account on https://developers.chirp.io, get
  *  your key, secret and config string from your account using the "16kHz-mono"
@@ -151,8 +151,7 @@ void on_sent_callback(void *data, uint8_t *payload, size_t length, uint8_t chann
     Screen.print(3, strLength);
     rgbLed.setColor(0, 255, 255);
 
-    free(payload);
-    free(identifier);
+    chirp_connect_free(identifier);
 }
 
 /*
@@ -181,8 +180,7 @@ void on_received_callback(void *data, uint8_t *payload, size_t length, uint8_t c
         Screen.print(3, strLength);
         rgbLed.setColor(0, 255, 0);
 
-        free(payload);
-        free(identifier);
+        chirp_connect_free(identifier);
     }
     // A null pointer with a length of 0 means the decode has failed.
     else
