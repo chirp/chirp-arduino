@@ -46,68 +46,6 @@ void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioOutput(int sample_rate);
 
 // Function declarations --------------------------------------
-void
-onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
-{
-  currentState = current;
-  Serial.printf("State changed from %d to %d\n", previous, current);
-}
-
-void
-onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
-{
-  Serial.println("Sending data...");
-  digitalWrite(LED_PIN, HIGH);
-}
-
-void
-onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
-{
-  char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
-  Serial.printf("Send data: %s\n", data);
-  digitalWrite(LED_PIN, LOW);
-  chirp_connect_free(data);
-}
-
-// Tasks -------------------------------------------------------
-
-void
-initTask(void *parameter)
-{
-  setupChirp();
-
-  uint32_t output_sample_rate = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
-  setupAudioOutput(SAMPLE_RATE);
-
-  Serial.printf("Heap size: %u\n", ESP.getFreeHeap());
-  startTasks = true;
-  vTaskDelete(NULL);
-}
-
-void
-processOutputTask(void *parameter)
-{
-  esp_err_t audioError;
-  chirp_connect_error_code_t chirpError;
-
-  size_t bytesLength = 0;
-  short buffer[BUFFER_SIZE] = {0};
-  int32_t ibuffer[BUFFER_SIZE] = {0};
-
-  while (currentState >= CHIRP_CONNECT_STATE_RUNNING) {
-    chirpError = chirp_connect_process_shorts_output(chirp, buffer, BUFFER_SIZE);
-    if (chirpError != CHIRP_CONNECT_OK) {
-      chirpErrorHandler(chirpError);
-    }
-    for (int i = 0; i < BUFFER_SIZE; i++) {
-      ibuffer[i] = (int32_t)buffer[i];
-    }
-    audioError = i2s_write(I2S_NUM_1, ibuffer, BUFFER_SIZE * 4, &bytesLength, portMAX_DELAY);
-  }
-  vTaskDelete(NULL);
-}
-
-// Main -------------------------------------------------------
 
 void
 setup()
@@ -149,7 +87,68 @@ IRAM_ATTR handleInterrupt()
   buttonPressed = true;
 }
 
+// Tasks -------------------------------------------------------
+
+void
+initTask(void *parameter)
+{
+  setupChirp();
+
+  uint32_t output_sample_rate = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
+  setupAudioOutput(SAMPLE_RATE);
+
+  Serial.printf("Heap size: %u\n", ESP.getFreeHeap());
+  startTasks = true;
+  vTaskDelete(NULL);
+}
+
+void
+processOutputTask(void *parameter)
+{
+  esp_err_t audioError;
+  chirp_connect_error_code_t chirpError;
+
+  size_t bytesLength = 0;
+  short buffer[BUFFER_SIZE] = {0};
+  int32_t ibuffer[BUFFER_SIZE] = {0};
+
+  while (currentState >= CHIRP_CONNECT_STATE_RUNNING) {
+    chirpError = chirp_connect_process_shorts_output(chirp, buffer, BUFFER_SIZE);
+    if (chirpError != CHIRP_CONNECT_OK) {
+      chirpErrorHandler(chirpError);
+    }
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+      ibuffer[i] = (int32_t)buffer[i];
+    }
+    audioError = i2s_write(I2S_NUM_1, ibuffer, BUFFER_SIZE * 4, &bytesLength, portMAX_DELAY);
+  }
+  vTaskDelete(NULL);
+}
+
 // Chirp -------------------------------------------------------
+
+void
+onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
+{
+  currentState = current;
+  Serial.printf("State changed from %d to %d\n", previous, current);
+}
+
+void
+onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+{
+  Serial.println("Sending data...");
+  digitalWrite(LED_PIN, HIGH);
+}
+
+void
+onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+{
+  char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
+  Serial.printf("Send data: %s\n", data);
+  digitalWrite(LED_PIN, LOW);
+  chirp_connect_free(data);
+}
 
 void
 setupChirp()

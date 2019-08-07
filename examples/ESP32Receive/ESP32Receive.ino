@@ -53,30 +53,28 @@ void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioInput(int sample_rate);
 
 // Function declarations --------------------------------------
+
 void
-onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
+setup()
 {
-  currentState = current;
-  Serial.printf("State changed from %d to %d\n", previous, current);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  Serial.begin(115200);
+  Serial.printf("Heap size: %u\n", ESP.getFreeHeap());
+
+  xTaskCreate(initTask, "initTask", 16384, NULL, 1, NULL);
 }
 
 void
-onReceivingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+loop()
 {
-  Serial.println("Receiving data...");
-  digitalWrite(LED_PIN, HIGH);
-}
+  esp_err_t audioError;
+  chirp_connect_error_code_t chirpError;
 
-void
-onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
-{
-  if (payload) {
-    char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
-    Serial.printf("data = %s\n", data);
-    digitalWrite(LED_PIN, LOW);
-    chirp_connect_free(data);
-  } else {
-    Serial.println("Decode failed.");
+  if (startTasks) {
+    xTaskCreate(processInputTask, "processInputTask", 16384, NULL, 5, NULL);
+    startTasks = false;
   }
 }
 
@@ -122,33 +120,34 @@ processInputTask(void *parameter)
   vTaskDelete(NULL);
 }
 
-// Main -------------------------------------------------------
+// Chirp -------------------------------------------------------
 
 void
-setup()
+onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
 {
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
-
-  Serial.begin(115200);
-  Serial.printf("Heap size: %u\n", ESP.getFreeHeap());
-
-  xTaskCreate(initTask, "initTask", 16384, NULL, 1, NULL);
+  currentState = current;
+  Serial.printf("State changed from %d to %d\n", previous, current);
 }
 
 void
-loop()
+onReceivingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
-  esp_err_t audioError;
-  chirp_connect_error_code_t chirpError;
+  Serial.println("Receiving data...");
+  digitalWrite(LED_PIN, HIGH);
+}
 
-  if (startTasks) {
-    xTaskCreate(processInputTask, "processInputTask", 16384, NULL, 5, NULL);
-    startTasks = false;
+void
+onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+{
+  if (payload) {
+    char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
+    Serial.printf("data = %s\n", data);
+    digitalWrite(LED_PIN, LOW);
+    chirp_connect_free(data);
+  } else {
+    Serial.println("Decode failed.");
   }
 }
-
-// Chirp -------------------------------------------------------
 
 void
 setupChirp()
