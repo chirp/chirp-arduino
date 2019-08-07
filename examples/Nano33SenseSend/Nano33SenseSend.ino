@@ -34,7 +34,6 @@
 // Global variables ------------------------------------------------------------
 
 static chirp_connect_t *chirp = NULL;
-uint8_t current;
 short *current_buffer;
 short buffer_one[BUFFER_SIZE];
 short buffer_two[BUFFER_SIZE];
@@ -66,13 +65,7 @@ void loop()
 {
   if (NRF_I2S->EVENTS_TXPTRUPD != 0)
   {
-    if (current == 0) {
-      current_buffer = buffer_one;
-      current = 1;
-    } else {
-      current_buffer = buffer_two;
-      current = 0;
-    }
+    current_buffer = current_buffer == buffer_one ? buffer_two : buffer_one;
     chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, current_buffer, BUFFER_SIZE);
     chirpErrorHandler(err);
     NRF_I2S->TXD.PTR = (uint32_t)(current_buffer);
