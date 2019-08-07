@@ -5,7 +5,7 @@
     @file ESP32Receive.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for the "arduino"
+    and copy and paste your key, secret and config string for the "16khz-mono"
     protocol into the credentials.h file.
 
     This example will start listening for chirps and print to the terminal
@@ -42,17 +42,17 @@
 */
 #define CONVERT_INPUT(sample) (((int32_t)(sample) >> 14) + MIC_CALIBRATION)
 
-// Global variables -------------------------------------------
+// Global variables ------------------------------------------------------------
 static chirp_connect_t *chirp = NULL;
 static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
 static bool startTasks = false;
 
-// Function definitions ---------------------------------------
+// Function definitions --------------------------------------------------------
 void setupChirp();
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioInput(int sample_rate);
 
-// Function declarations --------------------------------------
+// Function declarations -------------------------------------------------------
 
 void
 setup()
@@ -78,7 +78,7 @@ loop()
   }
 }
 
-// Tasks -------------------------------------------------------
+// RTOS Tasks ------------------------------------------------------------------
 
 void
 initTask(void *parameter)
@@ -110,17 +110,14 @@ processInputTask(void *parameter)
         buffer[i] = (float)CONVERT_INPUT(ibuffer[i]);
       }
 
-      uint32_t t1 = millis();
       chirpError = chirp_connect_process_input(chirp, buffer, bytesLength / 4);
-      if (chirpError != CHIRP_CONNECT_OK) {
-        chirpErrorHandler(chirpError);
-      }
+      chirpErrorHandler(chirpError);
     }
   }
   vTaskDelete(NULL);
 }
 
-// Chirp -------------------------------------------------------
+// Chirp -----------------------------------------------------------------------
 
 void
 onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
@@ -159,8 +156,7 @@ setupChirp()
   }
 
   chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   chirp_connect_callback_set_t callbacks = {0};
   callbacks.on_state_changed = onStateChangedCallback;
@@ -168,16 +164,13 @@ setupChirp()
   callbacks.on_received = onReceivedCallback;
 
   err = chirp_connect_set_callbacks(chirp, callbacks);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   err = chirp_connect_set_callback_ptr(chirp, chirp);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   err = chirp_connect_start(chirp);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   Serial.println("Chirp Connect initialised.");
 }
@@ -185,18 +178,15 @@ setupChirp()
 void
 chirpErrorHandler(chirp_connect_error_code_t code)
 {
-  if (code != CHIRP_CONNECT_OK) {
+  if (code != CHIRP_CONNECT_OK)
+  {
     const char *error_string = chirp_connect_error_code_to_string(code);
-    Serial.printf("Chirp error handler : %s\n", error_string);
-    chirp_connect_free((void *) error_string);
-    while (true) {
-      delay(1000);
-      Serial.print('.');
-    }
+    Serial.println(error_string);
+    exit(42);
   }
 }
 
-// Audio -------------------------------------------------------
+// I2S Audio -------------------------------------------------------------------
 
 void
 setupAudioInput(int sample_rate)

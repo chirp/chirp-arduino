@@ -33,19 +33,19 @@
 #define BUFFER_SIZE       512
 #define SAMPLE_RATE       16000
 
-// Global variables -------------------------------------------
+// Global variables ------------------------------------------------------------
 static chirp_connect_t *chirp = NULL;
 static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
 static volatile bool buttonPressed = false;
 static bool startTasks = false;
 
-// Function definitions ---------------------------------------
+// Function definitions --------------------------------------------------------
 void IRAM_ATTR handleInterrupt();
 void setupChirp();
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioOutput(int sample_rate);
 
-// Function declarations --------------------------------------
+// Function declarations -------------------------------------------------------
 
 void
 setup()
@@ -87,7 +87,7 @@ IRAM_ATTR handleInterrupt()
   buttonPressed = true;
 }
 
-// Tasks -------------------------------------------------------
+// Tasks -----------------------------------------------------------------------
 
 void
 initTask(void *parameter)
@@ -114,9 +114,8 @@ processOutputTask(void *parameter)
 
   while (currentState >= CHIRP_CONNECT_STATE_RUNNING) {
     chirpError = chirp_connect_process_shorts_output(chirp, buffer, BUFFER_SIZE);
-    if (chirpError != CHIRP_CONNECT_OK) {
-      chirpErrorHandler(chirpError);
-    }
+    chirpErrorHandler(chirpError);
+
     for (int i = 0; i < BUFFER_SIZE; i++) {
       ibuffer[i] = (int32_t)buffer[i];
     }
@@ -125,7 +124,7 @@ processOutputTask(void *parameter)
   vTaskDelete(NULL);
 }
 
-// Chirp -------------------------------------------------------
+// Chirp -----------------------------------------------------------------------
 
 void
 onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
@@ -160,8 +159,7 @@ setupChirp()
   }
 
   chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   chirp_connect_callback_set_t callbacks = {0};
   callbacks.on_sending = onSendingCallback;
@@ -169,16 +167,13 @@ setupChirp()
   callbacks.on_state_changed = onStateChangedCallback;
 
   err = chirp_connect_set_callbacks(chirp, callbacks);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   err = chirp_connect_set_callback_ptr(chirp, chirp);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   err = chirp_connect_start(chirp);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   // Set volume to 0.5 to not distort output
   chirp_connect_set_volume(chirp, 0.5);
@@ -189,18 +184,15 @@ setupChirp()
 void
 chirpErrorHandler(chirp_connect_error_code_t code)
 {
-  if (code != CHIRP_CONNECT_OK) {
+  if (code != CHIRP_CONNECT_OK)
+  {
     const char *error_string = chirp_connect_error_code_to_string(code);
-    Serial.printf("Chirp error handler : %s\n", error_string);
-    chirp_connect_free((void *) error_string);
-    while (true) {
-      delay(1000);
-      Serial.print('.');
-    }
+    Serial.println(error_string);
+    exit(42);
   }
 }
 
-// Audio -------------------------------------------------------
+// I2S Audio -------------------------------------------------------------------
 
 void
 setupAudioOutput(int sample_rate)
