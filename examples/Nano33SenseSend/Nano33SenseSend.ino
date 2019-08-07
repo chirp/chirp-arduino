@@ -144,6 +144,8 @@ void sendRandomChirp()
 
   chirp_connect_error_code_t err = chirp_connect_send(chirp, payload, payload_len);
   chirpErrorHandler(err);
+
+  chirp_connect_free(payload);
 }
 
 // I2S Audio -------------------------------------------------------------------
