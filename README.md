@@ -10,7 +10,7 @@ Chirp is a library enabling Arduino-based devices to send and receive data using
  * A digital I2S MEMS microphone
  * A digital I2S amplifier and compatible speaker
 
-For sound input you will need a digital MEMS microphone such as the SPH0645 or ICS-43434.
+For sound input you will need a digital MEMS microphone such as the SPH0645 or ICS-43434. (Not necessary for the Nano 33 Sense as it comes with an on board microphone)
 For sound output it is recommended to use a digital I2S output such as the UDA1334A or MAX98357A connected to a compatible speaker.
 
 You can quickly test the sound input by playing random chirps from the [Developer Hub](https://developers.chirp.io).
@@ -44,18 +44,17 @@ Once installed, you can access the example programs from the menu :
 
 ```File > Examples > ChirpSDK > Example ```
 
-and you can include the headers to use Chirp in your own code by using :
+and you can include the headers to use Chirp in your own code by adding :
 
-```Sketch > Import Library > ChirpSDK```
+```#include "chirp_connect.h"```
 
 ## Usage
 
 To set up the Chirp SDK, initialise and configure with your app key,
 secret and config from the [Developer Hub](https://developers.chirp.io).
 
-*Note* that any configuration will work for the send only boards, however it is
-recommended to use a lightweight protocol such as `16khz-mono` when receiving data on
-Arduino due to the minimal memory available.
+*Note* You must select the `arduino` protocol from the dropdown menu, when
+selecting your chirp configuration.
 
     chirp = new_chirp_connect(APP_KEY, APP_SECRET);
     if (chirp == NULL) {
@@ -152,10 +151,18 @@ A Chirp payload is simply an array of bytes. You can send a random data payload 
 
     err = chirp_connect_send(chirp, payload, payload_length);
     if (err != CHIRP_CONNECT_OK) {
-        const char *error_string = chirp_connect_error_code_to_string(error_code);
+        const char *error_string = chirp_connect_error_code_to_string(err);
         printf("%s\n", error_string);
     }
 
+Or you can easily send an ASCII string
+
+    char *identifier = "hello";
+    err = chirp_connect_send(chirp, (uint8_t *)identifier, strlen(identifier));
+    if (err != CHIRP_CONNECT_OK) {
+        const char *error_string = chirp_connect_error_code_to_string(err);
+        printf("%s\n", error_string);
+    }
 
 ## Processing
 
