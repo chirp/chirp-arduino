@@ -49,7 +49,6 @@
 int buffer[NUM_BUFFERS][BUFFER_SIZE];
 short tmpBuffer[BUFFER_SIZE / 2];
 uint8_t next, current;
-int counter;
 
 Adafruit_ZeroI2S i2s;
 Adafruit_ZeroDMA dma;
@@ -70,7 +69,6 @@ void setupChirp(void);
 void setup()
 {
   current = 0;
-  counter = 0;
 
   Serial.begin(115200);
   while(!Serial);  // Wait for Serial monitor before continuing
@@ -88,10 +86,10 @@ void setup()
   char *hex = chirp_connect_as_string(chirp, payload, payload_len);
   Serial.print("Generated payload: ");
   Serial.println(hex);
+  chirp_connect_free(hex);
 
   chirp_connect_error_code_t err = chirp_connect_send(chirp, payload, payload_len);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   ZeroDMAstatus stat = dma.startJob();
   if (stat != DMA_STATUS_OK)
@@ -106,10 +104,11 @@ void loop()
   if (dma_complete) {
     next = (current + 1) % NUM_BUFFERS;
 
+    // Process data in to the next mono buffer
     chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, tmpBuffer, BUFFER_SIZE / 2);
-    if (err != CHIRP_CONNECT_OK)
-      chirpErrorHandler(err);
+    chirpErrorHandler(err);
 
+    // Copy the data into a stereo buffer for audio output
     for (int i = 0; i < BUFFER_SIZE / 2; i++) {
       int value = tmpBuffer[i] * VOLUME;
       buffer[next][i * 2] = value;
@@ -128,7 +127,6 @@ void chirpErrorHandler(chirp_connect_error_code_t code)
   {
     const char *error_string = chirp_connect_error_code_to_string(code);
     Serial.println(error_string);
-    chirp_connect_free((void *) error_string);
     exit(42);
   }
 }
@@ -153,28 +151,24 @@ void setupChirp(void)
   }
 
   chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
- chirp_connect_callback_set_t callback_set = {
-   .on_state_changed = NULL,
-   .on_sending = onSendingCallback,
-   .on_sent = onSentCallback,
-   .on_receiving = NULL,
-   .on_received = NULL
- };
+  chirp_connect_callback_set_t callback_set = {
+    .on_state_changed = NULL,
+    .on_sending = onSendingCallback,
+    .on_sent = onSentCallback,
+    .on_receiving = NULL,
+    .on_received = NULL
+  };
 
- err = chirp_connect_set_callbacks(chirp, callback_set);
- if (err != CHIRP_CONNECT_OK)
-   chirpErrorHandler(err);
+  err = chirp_connect_set_callbacks(chirp, callback_set);
+  chirpErrorHandler(err);
 
   err = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   err = chirp_connect_start(chirp);
-  if (err != CHIRP_CONNECT_OK)
-    chirpErrorHandler(err);
+  chirpErrorHandler(err);
 
   Serial.println("Chirp SDK initialised.");
   Serial.flush();
