@@ -29,22 +29,22 @@
 #define SAMPLE_RATE       16000
 #define BUFFER_SIZE       256
 
-// Global variables -------------------------------------------
+// Global variables ------------------------------------------------------------
 
 static chirp_connect_t *chirp = NULL;
 short sampleBuffer[BUFFER_SIZE];
 uint32_t counter;
 volatile int samplesRead;
 
-// Function definitions ---------------------------------------
+// Function definitions --------------------------------------------------------
 
 void setupChirp(void);
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void onPDMdata(void);
 
-// Main -------------------------------------------------------
+// Main ------------------------------------------------------------------------
 
-void setup() 
+void setup()
 {
   Serial.begin(115200);
   while (!Serial);
@@ -54,16 +54,16 @@ void setup()
   PDM.onReceive(onPDMdata);
   PDM.setGain(30);
 
-  if (!PDM.begin(1, SAMPLE_RATE)) 
+  if (!PDM.begin(1, SAMPLE_RATE))
   {
     Serial.println("Failed to start PDM!");
     while (1);
   }
 }
 
-void loop() 
+void loop()
 {
-  if (samplesRead) 
+  if (samplesRead)
   {
     chirp_connect_error_code_t err = chirp_connect_process_shorts_input(chirp, sampleBuffer, samplesRead);
     chirpErrorHandler(err);
@@ -71,14 +71,14 @@ void loop()
   }
 }
 
-void onPDMdata() 
+void onPDMdata()
 {
   int bytesAvailable = PDM.available();
   PDM.read(sampleBuffer, bytesAvailable);
   samplesRead = bytesAvailable / sizeof(short);
 }
 
-// Chirp ------------------------------------------------------
+// Chirp -----------------------------------------------------------------------
 
 void onReceivingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
@@ -87,15 +87,15 @@ void onReceivingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t c
 
 void onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
-  if (payload) 
+  if (payload)
   {
     char *data = (char *)calloc(length + 1, sizeof(uint8_t));
     memcpy(data, payload, length * sizeof(uint8_t));
     Serial.print("Received data: ");
     Serial.println(data);
     free(data);
-  } 
-  else 
+  }
+  else
   {
     Serial.println("Decode failed.");
   }
@@ -107,7 +107,6 @@ void chirpErrorHandler(chirp_connect_error_code_t code)
   {
     const char *error_string = chirp_connect_error_code_to_string(code);
     Serial.println(error_string);
-    chirp_connect_free((void *) error_string);
     exit(42);
   }
 }
