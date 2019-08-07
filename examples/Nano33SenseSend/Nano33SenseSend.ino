@@ -49,8 +49,6 @@ void i2s_start(void);
 
 void setup()
 {
-  current = 0;
-
   Serial.begin(115200);
   while(!Serial);  // Wait for Serial monitor before continuing
 
@@ -75,14 +73,12 @@ void loop()
 
 // Chirp -----------------------------------------------------------------------
 
-void
-onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+void onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
   Serial.println("Sending data...");
 }
 
- void
-onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
   char *data = (char *)calloc(length + 1, sizeof(uint8_t));
   memcpy(data, payload, length);
