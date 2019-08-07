@@ -5,7 +5,7 @@
     @file esp32.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for the "arduino"
+    and copy and paste your key, secret and config string for the "16khz-mono"
     protocol into the credentials.h file.
 
     This example will start listening for chirps and print to the terminal
@@ -13,7 +13,6 @@
 
     If the EN switch is pressed on the board, a random chirp will be sent to
     the audio output.
-
 
     Copyright © 2011-2019, Asio Ltd.
     All rights reserved.
