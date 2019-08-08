@@ -11,8 +11,11 @@
     This example will start listening for chirps and print to the terminal
     when anything is received.
 
-    Note: this example can be used in conjunction with the send example,
+    *Note*: this example can be used in conjunction with the send example,
     to send and receive data in the same application.
+
+    *Important*: The example will not start until this Serial Monitor is opened.
+    To disable this behaviour, comment out the while(!Serial) line.
 
     Circuit:
       - Arduino Nano 33 BLE board

@@ -38,7 +38,7 @@ chirp_connect_get_output_sample_rate	KEYWORD2
 chirp_connect_set_input_sample_rate		KEYWORD2
 chirp_connect_set_output_sample_rate	KEYWORD2
 chirp_connect_get_auto_mute				KEYWORD2
-chirp_connect_set_auto_mute				KEYWORD2
+chirp_connect_set_listen_to_self		KEYWORD2
 chirp_connect_set_callback_ptr			KEYWORD2
 chirp_connect_set_frequency_correction	KEYWORD2
 chirp_connect_get_version				KEYWORD2

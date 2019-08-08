@@ -30,16 +30,19 @@
 #define LED_PIN           2      // LED
 #define SWITCH_PIN        0      // Switch
 
+#define VOLUME            0.5    // Between 0 and 1
 #define BUFFER_SIZE       512
 #define SAMPLE_RATE       16000
 
 // Global variables ------------------------------------------------------------
+
 static chirp_connect_t *chirp = NULL;
 static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
 static volatile bool buttonPressed = false;
 static bool startTasks = false;
 
 // Function definitions --------------------------------------------------------
+
 void IRAM_ATTR handleInterrupt();
 void setupChirp();
 void chirpErrorHandler(chirp_connect_error_code_t code);
@@ -73,12 +76,12 @@ loop()
   }
 
   if (buttonPressed) {
-    size_t payloadLength = 0;
-    uint8_t *payload = chirp_connect_random_payload(chirp, &payloadLength);
-    chirp_connect_send(chirp, payload, payloadLength);
-    Serial.println("Sending data...");
+    char *payload = "hello";
+    chirpError = chirp_connect_send(chirp, payload, strlen(payload));
+    chirpErrorHandler(chirpError);
+    Serial.print("Sending data: ");
+    Serial.println(payload);
     buttonPressed = false;
-    chirp_connect_free(payload);
   }
 }
 
@@ -176,8 +179,8 @@ setupChirp()
   err = chirp_connect_start(chirp);
   chirpErrorHandler(err);
 
-  // Set volume to 0.5 to not distort output
-  chirp_connect_set_volume(chirp, 0.5);
+  err = chirp_connect_set_volume(chirp, VOLUME);
+  chirpErrorHandler(err);
 
   Serial.println("Chirp SDK initialised.");
 }

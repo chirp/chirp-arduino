@@ -18,6 +18,9 @@
     *Note*: This board is send-only, so cannot be configured to receive
     data due to the minimal memory available on the board
 
+    *Important*: The example will not start until this Serial Monitor is opened.
+    To disable this behaviour, comment out the while(!Serial) line.
+
     Circuit:
       - Arduino MKRZero
       - Adafruit UDA1334
@@ -38,13 +41,13 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define VOLUME            12000
+#define VOLUME            0.5  // Between 0 and 1
 
 #define NUM_BUFFERS       2
-#define BUFFER_SIZE       256
+#define BUFFER_SIZE       1024
 #define SAMPLE_RATE       44100
 
-// Global variables -------------------------------------------
+// Global variables ------------------------------------------------------------
 
 int buffer[NUM_BUFFERS][BUFFER_SIZE];
 short tmpBuffer[BUFFER_SIZE / 2];
@@ -57,14 +60,15 @@ DmacDescriptor  *desc;
 static chirp_connect_t *chirp = NULL;
 static volatile bool dma_complete = true;
 
-// Function definitions ---------------------------------------
+// Function definitions --------------------------------------------------------
 
 void dmaCallback(Adafruit_ZeroDMA *dma);
 void dmaErrorCallback(Adafruit_ZeroDMA *dma);
 void setupDMA(void);
 void setupChirp(void);
+void sendChirp(void);
 
-// Function declarations --------------------------------------
+// Function declarations -------------------------------------------------------
 
 void setup()
 {
@@ -80,16 +84,7 @@ void setup()
   i2s.enableMCLK();
   i2s.enableTx();
 
-  size_t payload_len = 5;
-  uint8_t *payload = chirp_connect_random_payload(chirp, &payload_len);
-
-  char *hex = chirp_connect_as_string(chirp, payload, payload_len);
-  Serial.print("Generated payload: ");
-  Serial.println(hex);
-  chirp_connect_free(hex);
-
-  chirp_connect_error_code_t err = chirp_connect_send(chirp, payload, payload_len);
-  chirpErrorHandler(err);
+  sendChirp();
 
   ZeroDMAstatus stat = dma.startJob();
   if (stat != DMA_STATUS_OK)
@@ -110,7 +105,7 @@ void loop()
 
     // Copy the data into a stereo buffer for audio output
     for (int i = 0; i < BUFFER_SIZE / 2; i++) {
-      int value = tmpBuffer[i] * VOLUME;
+      int value = tmpBuffer[i] * INT16_MAX;
       buffer[next][i * 2] = value;
       buffer[next][i * 2 + 1] = value;
     }
@@ -119,7 +114,7 @@ void loop()
   }
 }
 
-// Chirp -----------------------------------------------------
+// Chirp -----------------------------------------------------------------------
 
 void chirpErrorHandler(chirp_connect_error_code_t code)
 {
@@ -141,7 +136,17 @@ void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channe
   Serial.println("Sent data...");
 }
 
-void setupChirp(void)
+void sendChirp()
+{
+  char *payload = "hello";
+  chirpError = chirp_connect_send(chirp, payload, strlen(payload));
+  chirpErrorHandler(chirpError);
+
+  Serial.print("Sending data: ");
+  Serial.println(payload);
+}
+
+void setupChirp()
 {
   chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (chirp == NULL)
@@ -167,6 +172,9 @@ void setupChirp(void)
   err = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
   chirpErrorHandler(err);
 
+  err = chirp_connect_set_volume(chirp, VOLUME);
+  chirpErrorHandler(err);
+
   err = chirp_connect_start(chirp);
   chirpErrorHandler(err);
 
@@ -174,7 +182,7 @@ void setupChirp(void)
   Serial.flush();
 }
 
-// I2S DMA ---------------------------------------------------
+// I2S DMA ---------------------------------------------------------------------
 
 void dmaCallback(Adafruit_ZeroDMA *dma)
 {
