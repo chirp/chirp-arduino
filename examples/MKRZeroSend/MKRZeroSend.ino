@@ -138,9 +138,11 @@ void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channe
 
 void sendChirp()
 {
+  chirp_connect_error_code_t err; 
+  
   char *payload = "hello";
-  chirpError = chirp_connect_send(chirp, payload, strlen(payload));
-  chirpErrorHandler(chirpError);
+  err = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
+  chirpErrorHandler(err);
 
   Serial.print("Sending data: ");
   Serial.println(payload);

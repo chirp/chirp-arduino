@@ -77,7 +77,7 @@ loop()
 
   if (buttonPressed) {
     char *payload = "hello";
-    chirpError = chirp_connect_send(chirp, payload, strlen(payload));
+    chirpError = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
     chirpErrorHandler(chirpError);
     Serial.print("Sending data: ");
     Serial.println(payload);

@@ -27,12 +27,12 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define VOLUME                 0.5  // Between 0 and 1
+#define VOLUME                 0.3  // Between 0 and 1
 #define BUFFER_SIZE            256
 #define OUTPUT_SAMPLE_RATE     16667
 
-#define I2S_SCK_PIN            23  // D7
-#define I2S_DATA_PIN           21  // D8
+#define I2S_DATA_PIN           23  // D7
+#define I2S_SCK_PIN            21  // D8
 #define I2S_LRCK_PIN           27  // D9
 
 // Global variables ------------------------------------------------------------
@@ -140,9 +140,11 @@ void setupChirp(void)
 
 void sendChirp()
 {
+  chirp_connect_error_code_t err;
+  
   char *payload = "hello";
-  chirpError = chirp_connect_send(chirp, payload, strlen(payload));
-  chirpErrorHandler(chirpError);
+  err = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
+  chirpErrorHandler(err);
 
   Serial.print("Sending data: ");
   Serial.println(payload);
