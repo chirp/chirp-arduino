@@ -8,7 +8,7 @@ Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
  - Added support for cortex-m4 (Nano 33 Sense)
  - Build v3.3.0-rc1
 
-## v3.2.0 (14/03/2019)
+## v3.2.0 (14/03/2019)
 
  - Build v3.2.9
  - Optimised DSP for ESP32
