@@ -5,8 +5,8 @@
     @file MKRZeroSend.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for chosen
-    protocol into the credentials.h file.
+    and copy and paste your key, secret and config string for the
+    "16khz-mono-embedded" protocol into the credentials.h file.
 
     This example will start sending a random chirp payload on start up.
 
@@ -138,8 +138,8 @@ void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channe
 
 void sendChirp()
 {
-  chirp_connect_error_code_t err; 
-  
+  chirp_connect_error_code_t err;
+
   char *payload = "hello";
   err = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
   chirpErrorHandler(err);

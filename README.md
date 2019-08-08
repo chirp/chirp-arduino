@@ -53,7 +53,7 @@ and you can include the headers to use Chirp in your own code by adding :
 To set up the Chirp SDK, initialise and configure with your app key,
 secret and config from the [Developer Hub](https://developers.chirp.io).
 
-*Note* You must select the `arduino` protocol from the dropdown menu, when
+*Note* You must select the `16khz-mono-embedded` protocol from the dropdown menu, when
 selecting your chirp configuration.
 
     chirp = new_chirp_connect(APP_KEY, APP_SECRET);

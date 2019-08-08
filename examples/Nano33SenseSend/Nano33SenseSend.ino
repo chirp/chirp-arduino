@@ -6,8 +6,8 @@
     @file Nano33SenseSend.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for the "arduino"
-    protocol into the credentials.h file.
+    and copy and paste your key, secret and config string for the
+    "16khz-mono-embedded" protocol into the credentials.h file.
 
     This example will start listening for chirps and print to the terminal
     when anything is received.
@@ -141,7 +141,7 @@ void setupChirp(void)
 void sendChirp()
 {
   chirp_connect_error_code_t err;
-  
+
   char *payload = "hello";
   err = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
   chirpErrorHandler(err);
