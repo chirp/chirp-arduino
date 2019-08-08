@@ -5,14 +5,17 @@
     @file Nano33SenseReceive.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for the "arduino"
-    protocol into the credentials.h file.
+    and copy and paste your key, secret and config string for the
+    "16khz-mono-embedded" protocol into the credentials.h file.
 
     This example will start listening for chirps and print to the terminal
     when anything is received.
 
-    Note: this example can be used in conjunction with the send example,
+    *Note*: this example can be used in conjunction with the send example,
     to send and receive data in the same application.
+
+    *Important*: The example will not start until this Serial Monitor is opened.
+    To disable this behaviour, comment out the while(!Serial) line.
 
     Circuit:
       - Arduino Nano 33 BLE board

@@ -2,12 +2,12 @@
 
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
-## v3.3.0 (beta)
- - Added send-only support for cortex-m0plus (MKRZero, MKR Vidor 4000)
+## v3.3.0 (09/08/2019)
  - Added support for cortex-m4 (Nano 33 Sense)
+ - Added send-only support for cortex-m0plus (MKRZero, MKR Vidor 4000)
  - Build v3.3.0-rc1
 
-## v3.2.0 (14/03/2019)
+## v3.2.0 (14/03/2019)
 
  - Build v3.2.9
  - Optimised DSP for ESP32

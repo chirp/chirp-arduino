@@ -6,11 +6,14 @@
     @file Nano33SenseSend.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for the "arduino"
-    protocol into the credentials.h file.
+    and copy and paste your key, secret and config string for the
+    "16khz-mono-embedded" protocol into the credentials.h file.
 
     This example will start listening for chirps and print to the terminal
     when anything is received.
+
+    *Important*: The example will not start until this Serial Monitor is opened.
+    To disable this behaviour, comment out the while(!Serial) line.
 
     Circuit:
       - Arduino Nano 33 BLE board
@@ -24,11 +27,12 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
+#define VOLUME                 0.3  // Between 0 and 1
 #define BUFFER_SIZE            256
 #define OUTPUT_SAMPLE_RATE     16667
 
-#define I2S_SCK_PIN            23  // D7
-#define I2S_DATA_PIN           21  // D8
+#define I2S_DATA_PIN           23  // D7
+#define I2S_SCK_PIN            21  // D8
 #define I2S_LRCK_PIN           27  // D9
 
 // Global variables ------------------------------------------------------------
@@ -42,6 +46,7 @@ short buffer_two[BUFFER_SIZE];
 
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupChirp(void);
+void sendChirp(void);
 void i2s_init(void);
 void i2s_start(void);
 
@@ -53,7 +58,7 @@ void setup()
   while(!Serial);  // Wait for Serial monitor before continuing
 
   setupChirp();
-  sendRandomChirp();
+  sendChirp();
 
   i2s_init();
   i2s_start();
@@ -123,7 +128,7 @@ void setupChirp(void)
   err = chirp_connect_set_output_sample_rate(chirp, OUTPUT_SAMPLE_RATE);
   chirpErrorHandler(err);
 
-  err = chirp_connect_set_volume(chirp, 0.5);
+  err = chirp_connect_set_volume(chirp, VOLUME);
   chirpErrorHandler(err);
 
   err = chirp_connect_start(chirp);
@@ -133,19 +138,16 @@ void setupChirp(void)
   Serial.flush();
 }
 
-void sendRandomChirp()
+void sendChirp()
 {
-  size_t payload_len = 5;
-  uint8_t *payload = chirp_connect_random_payload(chirp, &payload_len);
+  chirp_connect_error_code_t err;
 
-  char *hex = chirp_connect_as_string(chirp, payload, payload_len);
-  Serial.print("Generated payload: ");
-  Serial.println(hex);
-
-  chirp_connect_error_code_t err = chirp_connect_send(chirp, payload, payload_len);
+  char *payload = "hello";
+  err = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
   chirpErrorHandler(err);
 
-  chirp_connect_free(payload);
+  Serial.print("Sending data: ");
+  Serial.println(payload);
 }
 
 // I2S Audio -------------------------------------------------------------------
