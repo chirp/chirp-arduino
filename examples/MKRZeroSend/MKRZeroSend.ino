@@ -41,7 +41,7 @@
 #define VOLUME            12000
 
 #define NUM_BUFFERS       2
-#define BUFFER_SIZE       256
+#define BUFFER_SIZE       512
 #define SAMPLE_RATE       44100
 
 // Global variables -------------------------------------------
