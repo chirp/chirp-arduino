@@ -136,8 +136,7 @@ void onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_c
   Serial.printf("State changed from %d to %d\n", previous, current);
 }
 
-void
-onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+void onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
   Serial.println("Sending data...");
   digitalWrite(LED_PIN, HIGH);
