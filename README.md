@@ -7,24 +7,26 @@
 Chirp is a library enabling Arduino-based devices to send and receive data using sound. You'll need:
 
  * A compatible Arduino board
- * A digital I2S MEMS microphone
+ * A digital I2S MEMS microphone (if your board does not contain a microphone)
  * A digital I2S amplifier and compatible speaker
 
-For sound input you will need a digital MEMS microphone such as the SPH0645 or ICS-43434. (Not necessary for the Nano 33 Sense as it comes with an on board microphone)
-For sound output it is recommended to use a digital I2S output such as the UDA1334A or MAX98357A connected to a compatible speaker.
+For receiving data, you will need a digital MEMS microphone. Some boards (for example, the Nano 33 Sense and Microsoft MXChip) already include a MEMS mic so you are good to go. For others, you will need an external mic such as the [SPH0645](https://www.adafruit.com/product/3421) or [ICS-43434](https://www.mouser.co.uk/ProductDetail/TDK-InvenSense/ICS-43434?qs=u4fy%2FsgLU9PAgmWRI7%252BqXA%3D%3D). 
 
-You can quickly test the sound input by playing random chirps from the [Developer Hub](https://developers.chirp.io).
-The easiest way to test the sound output would be to use Chirp on the [command line](https://developers.chirp.io/docs/tutorials/command-line) to receive data from the Arduino.
+For sending data, we recommend using a digital I2S audio output such as the [UDA1334A](https://www.adafruit.com/product/3678) or [MAX98357A](https://www.adafruit.com/product/3006), connected to a compatible speaker.
+
+You can quickly test that your device is receiving chirps by playing some random test signals from the [Developer Hub](https://developers.chirp.io).
+
+To test whether your device is sending chirps OK, we recommend setting up the [Python command-line tools](https://developers.chirp.io/docs/tutorials/command-line) to receive data from the Arduino.
 
 ## Supported hardware
 
-Send and receive capabilities
+The following Arduino-compatible boards are able to both send and receive chirps:
 
  * Arduino Nano 33 Sense
  * Microsoft MXChip
  * ESP32
 
-Send only
+The following Arduino-compatible boards are only able to send chirps, as they are not able to do on-chip DSP:
 
  * Arduino MKRZero
  * Arduino Vidor 4000
@@ -36,17 +38,21 @@ Send only
 
 Chirp is written for the Arduino IDE versions 1.8.6 and above.
 
-Install ChirpSDK as a library. For instructions, see
+Install ChirpSDK as a library using "Manage Libraries". For instructions, see
 
 [http://arduino.cc/en/Guide/Libraries](http://arduino.cc/en/Guide/Libraries)
 
-Once installed, you can access the example programs from the menu :
+Once installed, you can access the example programs from the menu:
 
-```File > Examples > ChirpSDK > Example ```
+```
+File > Examples > ChirpSDK > Example
+```
 
-and you can include the headers to use Chirp in your own code by adding :
+and you can include the headers to use Chirp in your own code by adding:
 
-```#include "chirp_connect.h"```
+```
+#include "chirp_connect.h"
+```
 
 ## Usage
 

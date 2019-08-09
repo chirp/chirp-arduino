@@ -1,7 +1,7 @@
 /**-----------------------------------------------------------------------------
 
-    Example code to send data using Arduino Nano 33 Sense board, an
-    Adafruit MAX98357A and a mini oval speaker
+    Example code to send data using the Chirp SDK, on the Arduino Nano 33 Sense
+    board with Adafruit MAX98357A and a mini oval speaker
 
     @file Nano33SenseSend.ino
 
@@ -9,8 +9,8 @@
     and copy and paste your key, secret and config string for the
     "16khz-mono-embedded" protocol into the credentials.h file.
 
-    This example will start listening for chirps and print to the terminal
-    when anything is received.
+    This example will send a single Chirp signal on startup, containing random
+    data.
 
     *Important*: The example will not start until this Serial Monitor is opened.
     To disable this behaviour, comment out the while(!Serial) line.
@@ -38,9 +38,9 @@
 // Global variables ------------------------------------------------------------
 
 static chirp_connect_t *chirp = NULL;
-short *current_buffer;
-short buffer_one[BUFFER_SIZE];
-short buffer_two[BUFFER_SIZE];
+short *currentBuffer;
+short buffer1[BUFFER_SIZE];
+short buffer2[BUFFER_SIZE];
 
 // Function definitions --------------------------------------------------------
 
@@ -68,10 +68,10 @@ void loop()
 {
   if (NRF_I2S->EVENTS_TXPTRUPD != 0)
   {
-    current_buffer = current_buffer == buffer_one ? buffer_two : buffer_one;
-    chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, current_buffer, BUFFER_SIZE);
+    currentBuffer = currentBuffer == buffer1 ? buffer2 : buffer1;
+    chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, currentBuffer, BUFFER_SIZE);
     chirpErrorHandler(err);
-    NRF_I2S->TXD.PTR = (uint32_t)(current_buffer);
+    NRF_I2S->TXD.PTR = (uint32_t)(currentBuffer);
     NRF_I2S->EVENTS_TXPTRUPD = 0;
   }
 }
@@ -152,8 +152,7 @@ void sendChirp()
 
 // I2S Audio -------------------------------------------------------------------
 
-void
-i2s_init()
+void i2s_init()
 {
   // Enable clocks
   NRF_I2S->CONFIG.TXEN = I2S_CONFIG_TXEN_TXEN_Enabled << I2S_CONFIG_TXEN_TXEN_Pos;
@@ -187,13 +186,12 @@ i2s_init()
   NRF_I2S->PSEL.SDOUT = I2S_DATA_PIN << I2S_PSEL_SDOUT_PIN_Pos;
 }
 
-void
-i2s_start()
+void i2s_start()
 {
   NRF_I2S->ENABLE = 1;
 
   // Configure DMA buffer
-  NRF_I2S->TXD.PTR = (uint32_t)(buffer_one);
+  NRF_I2S->TXD.PTR = (uint32_t)(buffer1);
   NRF_I2S->RXTXD.MAXCNT = BUFFER_SIZE / 2;
 
   NRF_I2S->TASKS_START = 1;
