@@ -1,19 +1,21 @@
-/**------------------------------------------------------------------------------
+/**-----------------------------------------------------------------------------
  *
  *  ASIO CONFIDENTIAL
  *
  *  @file chirp_connect_states.h
  *
+ *  @brief Enumeration of the possible states of the SDK.
+ *
  *  All contents are strictly proprietary, and not for copying, resale,
  *  or use outside of the agreed license.
  *
- *  Copyright © 2011-2018, Asio Ltd.
+ *  Copyright © 2011-2019, Asio Ltd.
  *  All rights reserved.
  *
  *----------------------------------------------------------------------------*/
 
-#ifndef __CHIRP_CONNECT_STATE_H__
-#define __CHIRP_CONNECT_STATE_H__
+#ifndef CHIRP_CONNECT_STATES_H
+#define CHIRP_CONNECT_STATES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,21 +25,15 @@ extern "C" {
  * Various states the SDK can return.
  */
 typedef enum {
-    // The audio processing has not been initialised yet
-    CHIRP_CONNECT_STATE_NOT_CREATED,
-    // The SDK is not processing audio
-    CHIRP_CONNECT_STATE_STOPPED,
-    // The audio processing is paused
-    CHIRP_CONNECT_STATE_PAUSED,
-    // The audio processing is running
-    CHIRP_CONNECT_STATE_RUNNING,
-    // The SDK is sending data
-    CHIRP_CONNECT_STATE_SENDING,
-    // The SDK is receiving data
-    CHIRP_CONNECT_STATE_RECEIVING,
+    CHIRP_CONNECT_STATE_NOT_CREATED, ///< The audio processing has not been initialised yet.
+    CHIRP_CONNECT_STATE_STOPPED, ///< The SDK is not processing audio.
+    CHIRP_CONNECT_STATE_RUNNING, ///< The audio processing is running.
+    CHIRP_CONNECT_STATE_SENDING, ///< The SDK is sending data.
+    CHIRP_CONNECT_STATE_RECEIVING, ///< The SDK is receiving data.
 } chirp_connect_state_t;
 
 #ifdef __cplusplus
 }
 #endif
-#endif // __CHIRP_CONNECT_STATE_H__
+
+#endif /* !CHIRP_CONNECT_STATES_H */
