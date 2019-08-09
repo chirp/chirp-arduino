@@ -152,8 +152,7 @@ void sendChirp()
 
 // I2S Audio -------------------------------------------------------------------
 
-void
-i2s_init()
+void i2s_init()
 {
   // Enable clocks
   NRF_I2S->CONFIG.TXEN = I2S_CONFIG_TXEN_TXEN_Enabled << I2S_CONFIG_TXEN_TXEN_Pos;
@@ -187,8 +186,7 @@ i2s_init()
   NRF_I2S->PSEL.SDOUT = I2S_DATA_PIN << I2S_PSEL_SDOUT_PIN_Pos;
 }
 
-void
-i2s_start()
+void i2s_start()
 {
   NRF_I2S->ENABLE = 1;
 

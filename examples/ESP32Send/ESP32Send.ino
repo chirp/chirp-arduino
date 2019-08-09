@@ -51,8 +51,7 @@ void setupAudioOutput(int sample_rate);
 
 // Function declarations -------------------------------------------------------
 
-void
-setup()
+void setup()
 {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
@@ -65,8 +64,7 @@ setup()
   xTaskCreate(initTask, "initTask", 16384, NULL, 1, NULL);
 }
 
-void
-loop()
+void loop()
 {
   esp_err_t audioError;
   chirp_connect_error_code_t chirpError;
@@ -88,16 +86,14 @@ loop()
   }
 }
 
-void
-IRAM_ATTR handleInterrupt()
+void IRAM_ATTR handleInterrupt()
 {
   buttonPressed = true;
 }
 
 // Tasks -----------------------------------------------------------------------
 
-void
-initTask(void *parameter)
+void initTask(void *parameter)
 {
   setupChirp();
 
@@ -109,8 +105,7 @@ initTask(void *parameter)
   vTaskDelete(NULL);
 }
 
-void
-processOutputTask(void *parameter)
+void processOutputTask(void *parameter)
 {
   esp_err_t audioError;
   chirp_connect_error_code_t chirpError;
@@ -135,8 +130,7 @@ processOutputTask(void *parameter)
 
 // Chirp -----------------------------------------------------------------------
 
-void
-onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
+void onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
 {
   currentState = current;
   Serial.printf("State changed from %d to %d\n", previous, current);
@@ -149,8 +143,7 @@ onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
   digitalWrite(LED_PIN, HIGH);
 }
 
-void
-onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
+void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
   char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
   Serial.printf("Send data: %s\n", data);
@@ -158,8 +151,7 @@ onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
   chirp_connect_free(data);
 }
 
-void
-setupChirp()
+void setupChirp()
 {
   chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (chirp == NULL)
@@ -191,8 +183,7 @@ setupChirp()
   Serial.println("Chirp SDK initialised.");
 }
 
-void
-chirpErrorHandler(chirp_connect_error_code_t code)
+void chirpErrorHandler(chirp_connect_error_code_t code)
 {
   if (code != CHIRP_CONNECT_OK)
   {
@@ -204,8 +195,7 @@ chirpErrorHandler(chirp_connect_error_code_t code)
 
 // I2S Audio -------------------------------------------------------------------
 
-void
-setupAudioOutput(int sample_rate)
+void setupAudioOutput(int sample_rate)
 {
   /*
      Set up I2S audio for UDA1334 DAC output
