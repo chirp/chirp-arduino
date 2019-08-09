@@ -1,6 +1,6 @@
 /**------------------------------------------------------------------------------
  *
- *  Simple example of the Chirp C SDK on the Microsoft MXChip IoT DevKit.
+ *  Simple example using the Chirp SDK on the Microsoft MXChip IoT DevKit.
  *
  *  @file MXChipSendReceive.ino
  *

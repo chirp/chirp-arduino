@@ -1,6 +1,7 @@
 /**-----------------------------------------------------------------------------
 
-    Example code to send data using ESP32 and UDA1334 audio output
+    Example code using the Chirpd SDK to send data using ESP32 and UDA1334
+    audio output
 
     @file ESP32Send.ino
 
@@ -27,11 +28,11 @@
 #define I2SO_BCK          18     // I2S BCLK on GPIO18
 #define I2SO_WSEL         5      // I2S SELECT on GPIO5
 
-#define LED_PIN           2      // LED
-#define SWITCH_PIN        0      // Switch
+#define LED_PIN           2      // Pin number for on-board LED
+#define SWITCH_PIN        0      // Pin number for on-board switch
 
-#define BUFFER_SIZE       512
-#define SAMPLE_RATE       16000
+#define BUFFER_SIZE       512    // Audio buffer size
+#define SAMPLE_RATE       16000  // Audio sample rate
 
 // Global variables ------------------------------------------------------------
 static chirp_connect_t *chirp = NULL;
@@ -67,12 +68,14 @@ loop()
   esp_err_t audioError;
   chirp_connect_error_code_t chirpError;
 
-  if (startTasks) {
+  if (startTasks)
+  {
     xTaskCreate(processOutputTask, "processOutputTask", 16384, NULL, 3, NULL);
     startTasks = false;
   }
 
-  if (buttonPressed) {
+  if (buttonPressed)
+  {
     size_t payloadLength = 0;
     uint8_t *payload = chirp_connect_random_payload(chirp, &payloadLength);
     chirp_connect_send(chirp, payload, payloadLength);
@@ -113,12 +116,14 @@ processOutputTask(void *parameter)
   short buffer[BUFFER_SIZE] = {0};
   int32_t ibuffer[BUFFER_SIZE] = {0};
 
-  while (currentState >= CHIRP_CONNECT_STATE_RUNNING) {
+  while (currentState >= CHIRP_CONNECT_STATE_RUNNING)
+  {
     chirpError = chirp_connect_process_shorts_output(chirp, buffer, BUFFER_SIZE);
     chirpErrorHandler(chirpError);
 
-    for (int i = 0; i < BUFFER_SIZE; i++) {
-      ibuffer[i] = (int32_t)buffer[i];
+    for (int i = 0; i < BUFFER_SIZE; i++)
+    {
+      ibuffer[i] = (int32_t) buffer[i];
     }
     audioError = i2s_write(I2S_NUM_1, ibuffer, BUFFER_SIZE * 4, &bytesLength, portMAX_DELAY);
   }
@@ -154,7 +159,8 @@ void
 setupChirp()
 {
   chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
-  if (chirp == NULL) {
+  if (chirp == NULL)
+  {
     Serial.println("Chirp initialisation failed.");
     return;
   }
@@ -204,7 +210,8 @@ setupAudioOutput(int sample_rate)
   esp_err_t err;
   Serial.println("Initialising audio output driver..");
 
-  const i2s_config_t i2s_config = {
+  const i2s_config_t i2s_config =
+  {
     .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
     .sample_rate = sample_rate,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
@@ -216,7 +223,8 @@ setupAudioOutput(int sample_rate)
     .use_apll = true
   };
 
-  const i2s_pin_config_t pin_config = {
+  const i2s_pin_config_t pin_config =
+  {
     .bck_io_num = I2SO_BCK,
     .ws_io_num = I2SO_WSEL,
     .data_out_num = I2SO_DATA,
@@ -224,19 +232,22 @@ setupAudioOutput(int sample_rate)
   };
 
   err = i2s_driver_install(I2S_NUM_1, &i2s_config, 0, NULL);
-  if (err != ESP_OK) {
+  if (err != ESP_OK)
+  {
     Serial.printf("Failed installing driver: %d\n", err);
     while (true);
   }
 
   err = i2s_set_pin(I2S_NUM_1, &pin_config);
-  if (err != ESP_OK) {
+  if (err != ESP_OK)
+  {
     Serial.printf("Failed setting pin: %d\n", err);
     while (true);
   }
 
   err = i2s_set_sample_rates(I2S_NUM_1, sample_rate);
-  if (err != ESP_OK) {
+  if (err != ESP_OK)
+  {
     Serial.printf("Failed to set sample rates: %d\n", err);
     while (true);
   }

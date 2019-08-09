@@ -1,6 +1,7 @@
 /**-----------------------------------------------------------------------------
 
-    Example code using MKRZero and UDA1334 audio output
+    Example code using the Chirp SDK to transmit data over sound, using the
+    MKRZero and UDA1334 audio output.
 
     @file MKRZeroSend.ino
 
@@ -15,8 +16,8 @@
     These buffers are read directly by the I2S peripheral to output
     audio data.
 
-    *Note*: This board is send-only, so cannot be configured to receive
-    data due to the minimal memory available on the board
+    *Note*: This board is send-only as it does not have a floating-point unit
+    which is required to receive data.
 
     Circuit:
       - Arduino MKRZero
@@ -38,7 +39,7 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define VOLUME            12000
+#define VOLUME            0.1
 
 #define NUM_BUFFERS       2
 #define BUFFER_SIZE       512
@@ -48,7 +49,8 @@
 
 int buffer[NUM_BUFFERS][BUFFER_SIZE];
 short tmpBuffer[BUFFER_SIZE / 2];
-uint8_t next, current;
+uint8_t nextBufferIndex, currentBufferIndex;
+uint16_t volumeInt;
 
 Adafruit_ZeroI2S i2s;
 Adafruit_ZeroDMA dma;
@@ -68,7 +70,8 @@ void setupChirp(void);
 
 void setup()
 {
-  current = 0;
+  currentBufferIndex = 0;
+  volumeInt = VOLUME * INT16_MAX;
 
   Serial.begin(115200);
   while(!Serial);  // Wait for Serial monitor before continuing
@@ -101,8 +104,9 @@ void setup()
 
 void loop()
 {
-  if (dma_complete) {
-    next = (current + 1) % NUM_BUFFERS;
+  if (dma_complete)
+  {
+    nextBufferIndex = (currentBufferIndex + 1) % NUM_BUFFERS;
 
     // Process data in to the next mono buffer
     chirp_connect_error_code_t err = chirp_connect_process_shorts_output(chirp, tmpBuffer, BUFFER_SIZE / 2);
@@ -110,9 +114,9 @@ void loop()
 
     // Copy the data into a stereo buffer for audio output
     for (int i = 0; i < BUFFER_SIZE / 2; i++) {
-      int value = tmpBuffer[i] * VOLUME;
-      buffer[next][i * 2] = value;
-      buffer[next][i * 2 + 1] = value;
+      int value = tmpBuffer[i] * volumeInt;
+      buffer[nextBufferIndex][i * 2] = value;
+      buffer[nextBufferIndex][i * 2 + 1] = value;
     }
 
     dma_complete = false;
@@ -178,15 +182,19 @@ void setupChirp(void)
 
 void dmaCallback(Adafruit_ZeroDMA *dma)
 {
-  current++;
-  if (current >= NUM_BUFFERS) {
-    current -= NUM_BUFFERS;
+  currentBufferIndex++;
+  if (currentBufferIndex >= NUM_BUFFERS)
+  {
+    currentBufferIndex -= NUM_BUFFERS;
   }
-  dma->changeDescriptor(desc, buffer[current]);
+  dma->changeDescriptor(desc, buffer[currentBufferIndex]);
   ZeroDMAstatus stat = dma->startJob();
-  if (stat == DMA_STATUS_OK) {
+  if (stat == DMA_STATUS_OK)
+  {
     dma_complete = true;
-  } else {
+  }
+  else
+  {
     Serial.println("ERROR");
   }
 }
@@ -208,7 +216,7 @@ void setupDMA(void)
 
   Serial.println("Setting up transfer");
   desc = dma.addDescriptor(
-    buffer[current],
+    buffer[currentBufferIndex],
     (void *)(&I2S->DATA[0].reg),
     BUFFER_SIZE,
     DMA_BEAT_SIZE_WORD,

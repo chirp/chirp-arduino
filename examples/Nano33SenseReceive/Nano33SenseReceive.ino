@@ -1,6 +1,7 @@
 /**-----------------------------------------------------------------------------
 
-    Example code to receive data using Arduino Nano 33 Sense board.
+    Example code using the Chirp SDK to receive data using the
+    Arduino Nano 33 Sense board.
 
     @file Nano33SenseReceive.ino
 
@@ -26,14 +27,13 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define SAMPLE_RATE       16000
-#define BUFFER_SIZE       256
+#define SAMPLE_RATE       16000   // Audio sample rate
+#define BUFFER_SIZE       256     // Audio buffer size
 
 // Global variables ------------------------------------------------------------
 
 static chirp_connect_t *chirp = NULL;
 short sampleBuffer[BUFFER_SIZE];
-uint32_t counter;
 volatile int samplesRead;
 
 // Function definitions --------------------------------------------------------
@@ -105,8 +105,8 @@ void chirpErrorHandler(chirp_connect_error_code_t code)
 {
   if (code != CHIRP_CONNECT_OK)
   {
-    const char *error_string = chirp_connect_error_code_to_string(code);
-    Serial.println(error_string);
+    const char *errorString = chirp_connect_error_code_to_string(code);
+    Serial.println(errorString);
     exit(42);
   }
 }
@@ -123,7 +123,8 @@ void setupChirp(void)
   chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
   chirpErrorHandler(err);
 
-  chirp_connect_callback_set_t callback_set = {
+  chirp_connect_callback_set_t callback_set =
+  {
     .on_state_changed = NULL,
     .on_sending = NULL,
     .on_sent = NULL,
@@ -137,6 +138,9 @@ void setupChirp(void)
   err = chirp_connect_set_input_sample_rate(chirp, SAMPLE_RATE);
   chirpErrorHandler(err);
 
+  // A fixed frequency correction coefficient is needed to correct a clock
+  // mismatch between the 16000Hz requested sample rate and the Nano's actual
+  // audio sample rate.
   err = chirp_connect_set_frequency_correction(chirp, 1.0096);
   chirpErrorHandler(err);
 
