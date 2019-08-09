@@ -4,22 +4,27 @@
  *
  *  @file chirp_connect_callbacks.h
  *
+ *  @brief Callback implementations of the C SDK.
+ *
  *  All contents are strictly proprietary, and not for copying, resale,
  *  or use outside of the agreed license.
  *
- *  Copyright © 2011-2018, Asio Ltd.
+ *  Copyright © 2011-2019, Asio Ltd.
  *  All rights reserved.
  *
  *----------------------------------------------------------------------------*/
 
-#ifndef __CHIRP_CONNECT_CALLBACK_H__
-#define __CHIRP_CONNECT_CALLBACK_H__
+#ifndef CHIRP_CONNECT_CALLBACKS_H
+#define CHIRP_CONNECT_CALLBACKS_H
+
+#include <stdint.h>
+#include <stddef.h>
+
+#include "chirp_connect_states.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "chirp_connect_states.h"
 
 /**
  * On_sending, on_sent, on_receiving and on_received callback prototype
@@ -42,9 +47,10 @@ extern "C" {
 typedef void (*chirp_connect_callback_t)(void *ptr, uint8_t *bytes, size_t length, uint8_t channel);
 
 /**
- * On_state_changed callback prototype definition. This is called if the callback
- * has been set and when the SDK's state is changing. The possibles values are
- * the one of the `chirp_connect_state_t` enum located in `chirp_connect_states.h`.
+ * On_state_changed callback prototype definition. This is called if the
+ * callback has been set and when the SDK's state is changing.
+ * The possibles values are the one of the `chirp_connect_state_t` enum
+ * located in `chirp_connect_states.h`.
  *
  * @param ptr       Pointer of data. It's either the pointer set when calling
  *                  `chirp_connect_set_callback_ptr` or NULL.
@@ -55,17 +61,19 @@ typedef void (*chirp_connect_state_callback_t)(void *ptr, chirp_connect_state_t 
 
 /**
  * Structure containing the callbacks pointers. It is not necessary to set all
- * the fields. This will only implies not being notified on the event omitted.
+ * the fields. Not setting a callback will only result in not being notified of
+ * the event.
  */
 typedef struct {
-    chirp_connect_state_callback_t on_state_changed;
-    chirp_connect_callback_t on_sending;
-    chirp_connect_callback_t on_sent;
-    chirp_connect_callback_t on_receiving;
-    chirp_connect_callback_t on_received;
+    chirp_connect_state_callback_t on_state_changed; ///< Triggered when the SDK's state is changing.
+    chirp_connect_callback_t on_sending; ///< Triggered when the SDK starts sending some data.
+    chirp_connect_callback_t on_sent; ///< Triggered when the SDK has sent the data.
+    chirp_connect_callback_t on_receiving; ///< Triggered when the SDK starts receiving some data.
+    chirp_connect_callback_t on_received; ///< Triggered when the SDK has received the data.
 } chirp_connect_callback_set_t;
 
 #ifdef __cplusplus
 }
 #endif
-#endif // __CHIRP_CONNECT_CALLBACK_H__
+
+#endif /* !CHIRP_CONNECT_CALLBACKS_H */
