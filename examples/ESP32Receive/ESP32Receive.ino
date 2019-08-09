@@ -6,8 +6,8 @@
     @file ESP32Receive.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for the "16khz-mono"
-    protocol into the credentials.h file.
+    and copy and paste your key, secret and config string for the
+    "16khz-mono-embedded" protocol into the credentials.h file.
 
     This example will start listening for chirps and print to the terminal
     when anything is received.
@@ -45,11 +45,13 @@
 #define CONVERT_INPUT(sample) (((int32_t)(sample) >> 14) + MIC_CALIBRATION)
 
 // Global variables ------------------------------------------------------------
+
 static chirp_connect_t *chirp = NULL;
 static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
 static bool startTasks = false;
 
 // Function definitions --------------------------------------------------------
+
 void setupChirp();
 void chirpErrorHandler(chirp_connect_error_code_t code);
 void setupAudioInput(int sample_rate);
@@ -145,10 +147,11 @@ onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel
 {
   if (payload)
   {
-    char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
-    Serial.printf("data = %s\n", data);
-    digitalWrite(LED_PIN, LOW);
-    chirp_connect_free(data);
+    char *data = (char *)calloc(length + 1, sizeof(uint8_t));
+    memcpy(data, payload, length * sizeof(uint8_t));
+    Serial.print("Received data: ");
+    Serial.println(data);
+    free(data);
   }
   else
   {

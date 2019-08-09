@@ -6,8 +6,8 @@
     @file MKRZeroSend.ino
 
     @brief Create a developer account at https://developers.chirp.io,
-    and copy and paste your key, secret and config string for chosen
-    protocol into the credentials.h file.
+    and copy and paste your key, secret and config string for the
+    "16khz-mono-embedded" protocol into the credentials.h file.
 
     This example will start sending a random chirp payload on start up.
 
@@ -18,6 +18,9 @@
 
     *Note*: This board is send-only as it does not have a floating-point unit
     which is required to receive data.
+
+    *Important*: The example will not start until this Serial Monitor is opened.
+    To disable this behaviour, comment out the while(!Serial) line.
 
     Circuit:
       - Arduino MKRZero
@@ -39,18 +42,17 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define VOLUME            0.1
+#define VOLUME            0.1  // Between 0 and 1
 
 #define NUM_BUFFERS       2
-#define BUFFER_SIZE       512
+#define BUFFER_SIZE       1024
 #define SAMPLE_RATE       44100
 
-// Global variables -------------------------------------------
+// Global variables ------------------------------------------------------------
 
 int buffer[NUM_BUFFERS][BUFFER_SIZE];
 short tmpBuffer[BUFFER_SIZE / 2];
 uint8_t nextBufferIndex, currentBufferIndex;
-uint16_t volumeInt;
 
 Adafruit_ZeroI2S i2s;
 Adafruit_ZeroDMA dma;
@@ -59,19 +61,19 @@ DmacDescriptor  *desc;
 static chirp_connect_t *chirp = NULL;
 static volatile bool dma_complete = true;
 
-// Function definitions ---------------------------------------
+// Function definitions --------------------------------------------------------
 
 void dmaCallback(Adafruit_ZeroDMA *dma);
 void dmaErrorCallback(Adafruit_ZeroDMA *dma);
 void setupDMA(void);
 void setupChirp(void);
+void sendChirp(void);
 
-// Function declarations --------------------------------------
+// Function declarations -------------------------------------------------------
 
 void setup()
 {
   currentBufferIndex = 0;
-  volumeInt = VOLUME * INT16_MAX;
 
   Serial.begin(115200);
   while(!Serial);  // Wait for Serial monitor before continuing
@@ -83,16 +85,7 @@ void setup()
   i2s.enableMCLK();
   i2s.enableTx();
 
-  size_t payload_len = 5;
-  uint8_t *payload = chirp_connect_random_payload(chirp, &payload_len);
-
-  char *hex = chirp_connect_as_string(chirp, payload, payload_len);
-  Serial.print("Generated payload: ");
-  Serial.println(hex);
-  chirp_connect_free(hex);
-
-  chirp_connect_error_code_t err = chirp_connect_send(chirp, payload, payload_len);
-  chirpErrorHandler(err);
+  sendChirp();
 
   ZeroDMAstatus stat = dma.startJob();
   if (stat != DMA_STATUS_OK)
@@ -113,17 +106,18 @@ void loop()
     chirpErrorHandler(err);
 
     // Copy the data into a stereo buffer for audio output
-    for (int i = 0; i < BUFFER_SIZE / 2; i++) {
-      int value = tmpBuffer[i] * volumeInt;
-      buffer[nextBufferIndex][i * 2] = value;
-      buffer[nextBufferIndex][i * 2 + 1] = value;
+    for (int i = 0; i < BUFFER_SIZE / 2; i++)
+    {
+      int value = tmpBuffer[i] * INT16_MAX;
+      buffer[next][i * 2] = value;
+      buffer[next][i * 2 + 1] = value;
     }
 
     dma_complete = false;
   }
 }
 
-// Chirp -----------------------------------------------------
+// Chirp -----------------------------------------------------------------------
 
 void chirpErrorHandler(chirp_connect_error_code_t code)
 {
@@ -145,7 +139,19 @@ void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channe
   Serial.println("Sent data...");
 }
 
-void setupChirp(void)
+void sendChirp()
+{
+  chirp_connect_error_code_t err;
+
+  char *payload = "hello";
+  err = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
+  chirpErrorHandler(err);
+
+  Serial.print("Sending data: ");
+  Serial.println(payload);
+}
+
+void setupChirp()
 {
   chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (chirp == NULL)
@@ -171,6 +177,9 @@ void setupChirp(void)
   err = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
   chirpErrorHandler(err);
 
+  err = chirp_connect_set_volume(chirp, VOLUME);
+  chirpErrorHandler(err);
+
   err = chirp_connect_start(chirp);
   chirpErrorHandler(err);
 
@@ -178,7 +187,7 @@ void setupChirp(void)
   Serial.flush();
 }
 
-// I2S DMA ---------------------------------------------------
+// I2S DMA ---------------------------------------------------------------------
 
 void dmaCallback(Adafruit_ZeroDMA *dma)
 {

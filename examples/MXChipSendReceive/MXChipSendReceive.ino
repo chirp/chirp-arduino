@@ -5,7 +5,7 @@
  *  @file MXChipSendReceive.ino
  *
  *  @brief After creating a developer account on https://developers.chirp.io, get
- *  your key, secret and config string from your account using the "16kHz-mono"
+ *  your key, secret and config string from your account using the "16kHz-mono-embedded"
  *  protocol, and set them in this file (in CHIRP_APP_KEY, CHIRP_APP_SECRET, CHIRP_APP_CONFIG).
  *
  *  This example will start in listening mode. The listening and playing modes
