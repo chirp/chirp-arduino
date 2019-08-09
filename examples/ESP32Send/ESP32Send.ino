@@ -244,5 +244,14 @@ void setupAudioOutput(int sample_rate)
     while (true);
   }
 
+  /*
+   * Known Issue
+   * The output sample rate is not correct if I2S0 is not configured
+   * This can be removed if receiving is set up on I2S0.
+   */
+  i2s_config_t i2s_config_stub = i2s_config;
+  i2s_config_stub.bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT;
+  i2s_driver_install(I2S_NUM_0, &i2s_config_stub, 0, NULL);
+
   Serial.println("Audio output driver initalised.");
 }
