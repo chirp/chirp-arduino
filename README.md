@@ -1,6 +1,6 @@
 # Chirp for Arduino
 
-*Version 3.3.0, August 2019*
+*Version 3.3.1, August 2019*
 
 ## Overview
 
@@ -10,7 +10,7 @@ Chirp is a library enabling Arduino-based devices to send and receive data using
  * A digital I2S MEMS microphone (if your board does not contain a microphone)
  * A digital I2S amplifier and compatible speaker
 
-For receiving data, you will need a digital MEMS microphone. Some boards (for example, the Nano 33 Sense and Microsoft MXChip) already include a MEMS mic so you are good to go. For others, you will need an external mic such as the [SPH0645](https://www.adafruit.com/product/3421) or [ICS-43434](https://www.mouser.co.uk/ProductDetail/TDK-InvenSense/ICS-43434?qs=u4fy%2FsgLU9PAgmWRI7%252BqXA%3D%3D). 
+For receiving data, you will need a digital MEMS microphone. Some boards (for example, the Nano 33 Sense and Microsoft MXChip) already include a MEMS mic so you are good to go. For others, you will need an external mic such as the [SPH0645](https://www.adafruit.com/product/3421) or [ICS-43434](https://www.mouser.co.uk/ProductDetail/TDK-InvenSense/ICS-43434?qs=u4fy%2FsgLU9PAgmWRI7%252BqXA%3D%3D).
 
 For sending data, we recommend using a digital I2S audio output such as the [UDA1334A](https://www.adafruit.com/product/3678) or [MAX98357A](https://www.adafruit.com/product/3006), connected to a compatible speaker.
 

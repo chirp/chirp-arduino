@@ -2,6 +2,9 @@
 
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
+## v3.3.1 (beta)
+ - Use high frequency oscillator in Nano 33 Sense examples
+
 ## v3.3.0 (09/08/2019)
 
  - Added support for cortex-m4 (Nano 33 Sense)
