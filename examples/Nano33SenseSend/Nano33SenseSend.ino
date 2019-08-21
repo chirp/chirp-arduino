@@ -27,7 +27,7 @@
 #include "chirp_connect.h"
 #include "credentials.h"
 
-#define VOLUME                 0.3  // Between 0 and 1
+#define VOLUME                 0.1  // Between 0 and 1
 #define BUFFER_SIZE            256
 #define OUTPUT_SAMPLE_RATE     16667
 
@@ -56,6 +56,11 @@ void setup()
 {
   Serial.begin(115200);
   while(!Serial);  // Wait for Serial monitor before continuing
+
+  // Enable high frequency oscillator
+  NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+  NRF_CLOCK->TASKS_HFCLKSTART    = 1;
+  while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 
   setupChirp();
   sendChirp();
