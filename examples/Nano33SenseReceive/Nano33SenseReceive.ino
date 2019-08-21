@@ -52,6 +52,11 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
 
+  // Enable high frequency oscillator
+  NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+  NRF_CLOCK->TASKS_HFCLKSTART    = 1;
+  while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
+
   setupChirp();
 
   PDM.onReceive(onPDMdata);
@@ -144,7 +149,7 @@ void setupChirp(void)
   // A fixed frequency correction coefficient is needed to correct a clock
   // mismatch between the 16000Hz requested sample rate and the Nano's actual
   // audio sample rate.
-  err = chirp_connect_set_frequency_correction(chirp, 1.0096);
+  err = chirp_connect_set_frequency_correction(chirp, 1.00812);
   chirpErrorHandler(err);
 
   err = chirp_connect_start(chirp);
