@@ -21,7 +21,7 @@
   ----------------------------------------------------------------------------*/
 #include <driver/i2s.h>
 
-#include "chirp_connect.h"
+#include "chirp_sdk.h"
 #include "credentials.h"
 
 #define I2SI_DATA         12     // I2S DATA IN on GPIO32
@@ -46,14 +46,14 @@
 
 // Global variables ------------------------------------------------------------
 
-static chirp_connect_t *chirp = NULL;
-static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
+static chirp_sdk_t *chirp = NULL;
+static chirp_sdk_state_t currentState = CHIRP_SDK_STATE_NOT_CREATED;
 static bool startTasks = false;
 
 // Function definitions --------------------------------------------------------
 
 void setupChirp();
-void chirpErrorHandler(chirp_connect_error_code_t code);
+void chirpErrorHandler(chirp_sdk_error_code_t code);
 void setupAudioInput(int sample_rate);
 
 // Function declarations -------------------------------------------------------
@@ -72,7 +72,7 @@ void setup()
 void loop()
 {
   esp_err_t audioError;
-  chirp_connect_error_code_t chirpError;
+  chirp_sdk_error_code_t chirpError;
 
   if (startTasks)
   {
@@ -87,7 +87,7 @@ void initTask(void *parameter)
 {
   setupChirp();
 
-  chirp_connect_error_code_t chirpError = chirp_connect_set_input_sample_rate(chirp, SAMPLE_RATE);
+  chirp_sdk_error_code_t chirpError = chirp_sdk_set_input_sample_rate(chirp, SAMPLE_RATE);
   chirpErrorHandler(chirpError);
   setupAudioInput(SAMPLE_RATE);
 
@@ -99,13 +99,13 @@ void initTask(void *parameter)
 void processInputTask(void *parameter)
 {
   esp_err_t audioError;
-  chirp_connect_error_code_t chirpError;
+  chirp_sdk_error_code_t chirpError;
 
   size_t bytesLength = 0;
   float buffer[BUFFER_SIZE] = {0};
   int32_t ibuffer[BUFFER_SIZE] = {0};
 
-  while (currentState >= CHIRP_CONNECT_STATE_RUNNING)
+  while (currentState >= CHIRP_SDK_STATE_RUNNING)
   {
     audioError = i2s_read(I2S_NUM_0, ibuffer, BUFFER_SIZE * 4, &bytesLength, portMAX_DELAY);
     if (bytesLength)
@@ -115,7 +115,7 @@ void processInputTask(void *parameter)
         buffer[i] = (float) CONVERT_INPUT(ibuffer[i]);
       }
 
-      chirpError = chirp_connect_process_input(chirp, buffer, bytesLength / 4);
+      chirpError = chirp_sdk_process_input(chirp, buffer, bytesLength / 4);
       chirpErrorHandler(chirpError);
     }
   }
@@ -124,7 +124,7 @@ void processInputTask(void *parameter)
 
 // Chirp -----------------------------------------------------------------------
 
-void onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
+void onStateChangedCallback(void *chirp, chirp_sdk_state_t previous, chirp_sdk_state_t current)
 {
   currentState = current;
   Serial.printf("State changed from %d to %d\n", previous, current);
@@ -154,38 +154,38 @@ void onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t ch
 
 void setupChirp()
 {
-  chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
+  chirp = new_chirp_sdk(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (chirp == NULL)
   {
     Serial.println("Chirp initialisation failed.");
     return;
   }
 
-  chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
+  chirp_sdk_error_code_t err = chirp_sdk_set_config(chirp, CHIRP_APP_CONFIG);
   chirpErrorHandler(err);
 
-  chirp_connect_callback_set_t callbacks = {0};
+  chirp_sdk_callback_set_t callbacks = {0};
   callbacks.on_state_changed = onStateChangedCallback;
   callbacks.on_receiving = onReceivingCallback;
   callbacks.on_received = onReceivedCallback;
 
-  err = chirp_connect_set_callbacks(chirp, callbacks);
+  err = chirp_sdk_set_callbacks(chirp, callbacks);
   chirpErrorHandler(err);
 
-  err = chirp_connect_set_callback_ptr(chirp, chirp);
+  err = chirp_sdk_set_callback_ptr(chirp, chirp);
   chirpErrorHandler(err);
 
-  err = chirp_connect_start(chirp);
+  err = chirp_sdk_start(chirp);
   chirpErrorHandler(err);
 
-  Serial.println("Chirp Connect initialised.");
+  Serial.println("Chirp SDK initialised.");
 }
 
-void chirpErrorHandler(chirp_connect_error_code_t code)
+void chirpErrorHandler(chirp_sdk_error_code_t code)
 {
-  if (code != CHIRP_CONNECT_OK)
+  if (code != CHIRP_SDK_OK)
   {
-    const char *error_string = chirp_connect_error_code_to_string(code);
+    const char *error_string = chirp_sdk_error_code_to_string(code);
     Serial.println(error_string);
     exit(42);
   }
