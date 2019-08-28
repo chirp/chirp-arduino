@@ -2,7 +2,10 @@
 
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
-## v3.3.1 (beta)
+## v3.4.0 (beta)
+ - Rename ChirpConnect to ChirpSDK
+
+## v3.3.1 (22/08/2019)
  - Use high frequency oscillator in Nano 33 Sense examples
 
 ## v3.3.0 (09/08/2019)

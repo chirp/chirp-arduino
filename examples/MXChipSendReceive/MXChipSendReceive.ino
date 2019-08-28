@@ -38,10 +38,10 @@
 #include "RGB_LED.h"
 
 /*
- * Main Chirp Connect header. This header and the ones it depends on must be in
+ * Main Chirp SDK header. This header and the ones it depends on must be in
  * the same folder.
  */
-#include "chirp_connect.h"
+#include "chirp_sdk.h"
 #include "credentials.h"
 
 /*
@@ -90,16 +90,16 @@ RGB_LED rgbLed;
  * Global pointer to the SDK structure. This is global as this pointer is
  * needed when processing the audio in the loop() function.
  */
-chirp_connect_t *chirp = NULL;
+chirp_sdk_t *chirp = NULL;
 
 /*
  * Simple error handler which display an error message and loop indefinitely.
  */
-void errorHandler(chirp_connect_error_code_t errorCode)
+void errorHandler(chirp_sdk_error_code_t errorCode)
 {
-    if (errorCode != CHIRP_CONNECT_OK)
+    if (errorCode != CHIRP_SDK_OK)
     {
-        Serial.printf("Error handler : %s\n", chirp_connect_error_code_to_string(errorCode));
+        Serial.printf("Error handler : %s\n", chirp_sdk_error_code_to_string(errorCode));
         while(true);
     }
 }
@@ -141,7 +141,7 @@ void on_sending_callback(void *data, uint8_t *payload, size_t length, uint8_t ch
  */
 void on_sent_callback(void *data, uint8_t *payload, size_t length, uint8_t channel)
 {
-    char *identifier = chirp_connect_as_string(chirp, payload, length);
+    char *identifier = chirp_sdk_as_string(chirp, payload, length);
     char strLength[8] = {0};
     itoa(length, strLength, 10);
 
@@ -151,7 +151,7 @@ void on_sent_callback(void *data, uint8_t *payload, size_t length, uint8_t chann
     Screen.print(3, strLength);
     rgbLed.setColor(0, 255, 255);
 
-    chirp_connect_free(identifier);
+    chirp_sdk_free(identifier);
 }
 
 /*
@@ -170,7 +170,7 @@ void on_received_callback(void *data, uint8_t *payload, size_t length, uint8_t c
     // A pointer not null with a length different than 0 means the decode has succedeed.
     if (payload && length != 0)
     {
-        char *identifier = chirp_connect_as_string(chirp, payload, length);
+        char *identifier = chirp_sdk_as_string(chirp, payload, length);
         char strLength[8] = {0};
         itoa(length, strLength, 10);
 
@@ -180,7 +180,7 @@ void on_received_callback(void *data, uint8_t *payload, size_t length, uint8_t c
         Screen.print(3, strLength);
         rgbLed.setColor(0, 255, 0);
 
-        chirp_connect_free(identifier);
+        chirp_sdk_free(identifier);
     }
     // A null pointer with a length of 0 means the decode has failed.
     else
@@ -202,7 +202,7 @@ void setup()
     pinMode(USER_BUTTON_A, INPUT);
     lastButtonAState = digitalRead(USER_BUTTON_A);
 
-    chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
+    chirp = new_chirp_sdk(CHIRP_APP_KEY, CHIRP_APP_SECRET);
     if (chirp)
     {
         printf("Initialisation is OK\n");
@@ -213,41 +213,41 @@ void setup()
         exit(1);
     }
 
-    chirp_connect_error_code_t errorCode = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
+    chirp_sdk_error_code_t errorCode = chirp_sdk_set_config(chirp, CHIRP_APP_CONFIG);
     errorHandler(errorCode);
 
     printf("Licence set correctly\n");
 
-    char *info = chirp_connect_get_info(chirp);
-    printf("%s - V%s\n", info, chirp_connect_get_version());
+    char *info = chirp_sdk_get_info(chirp);
+    printf("%s - V%s\n", info, chirp_sdk_get_version());
     free(info);
 
-    errorCode = chirp_connect_set_input_sample_rate(chirp, SAMPLE_RATE);
+    errorCode = chirp_sdk_set_input_sample_rate(chirp, SAMPLE_RATE);
     errorHandler(errorCode);
-    printf("Input sample rate is : %u\n", chirp_connect_get_input_sample_rate(chirp));
+    printf("Input sample rate is : %u\n", chirp_sdk_get_input_sample_rate(chirp));
 
-    errorCode = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
+    errorCode = chirp_sdk_set_output_sample_rate(chirp, SAMPLE_RATE);
     errorHandler(errorCode);
-    printf("Output sample rate is : %u\n", chirp_connect_get_output_sample_rate(chirp));
+    printf("Output sample rate is : %u\n", chirp_sdk_get_output_sample_rate(chirp));
 
     // The static structure is set to 0. This is needed because we are not setting
     // the `on_state_changed` callback.
-    chirp_connect_callback_set_t callbacks = {0};
+    chirp_sdk_callback_set_t callbacks = {0};
     callbacks.on_sending = on_sending_callback;
     callbacks.on_sent = on_sent_callback;
     callbacks.on_received = on_received_callback;
     callbacks.on_receiving = on_receiving_callback;
 
-    errorCode = chirp_connect_set_callbacks(chirp, callbacks);
+    errorCode = chirp_sdk_set_callbacks(chirp, callbacks);
     errorHandler(errorCode);
 
     printf("Callbacks set\n");
 
     // MXChip specific : A software adjustment of the sample rate is needed.
-    errorCode = chirp_connect_set_frequency_correction(chirp, 0.9950933459f);
+    errorCode = chirp_sdk_set_frequency_correction(chirp, 0.9950933459f);
     errorHandler(errorCode);
 
-    errorCode = chirp_connect_start(chirp);
+    errorCode = chirp_sdk_start(chirp);
     errorHandler(errorCode);
 
     printf("SDK started\n");
@@ -270,7 +270,7 @@ void loop()
 {
     buttonAState = digitalRead(USER_BUTTON_A);
     buttonBState = digitalRead(USER_BUTTON_B);
-    chirp_connect_error_code_t errorCode;
+    chirp_sdk_error_code_t errorCode;
 
     //  If we've pressed the button A, alternate the audio state between Recording and Playing.
     if (buttonAState == LOW && lastButtonAState == HIGH)
@@ -306,7 +306,7 @@ void loop()
             {
                 floatRecordBuffer[i] = (float) shortRecordBuffer[i * 2] / 32767.0f;
             }
-            errorCode = chirp_connect_process_input(chirp, floatRecordBuffer, FLOAT_BUFFER_SIZE);
+            errorCode = chirp_sdk_process_input(chirp, floatRecordBuffer, FLOAT_BUFFER_SIZE);
             errorHandler(errorCode);
             recordBufferState = BUFFER_STATE_EMPTY;
         }
@@ -317,17 +317,17 @@ void loop()
         if (buttonBState == LOW && lastButtonBState == HIGH)
         {
             size_t randomPayloadLength = 0;
-            uint8_t *randomPayload =  chirp_connect_random_payload(chirp, &randomPayloadLength);
-            errorCode = chirp_connect_send(chirp, randomPayload, randomPayloadLength);
+            uint8_t *randomPayload =  chirp_sdk_random_payload(chirp, &randomPayloadLength);
+            errorCode = chirp_sdk_send(chirp, randomPayload, randomPayloadLength);
             errorHandler(errorCode);
             free(randomPayload);
         }
 
-        chirp_connect_state_t state = chirp_connect_get_state(chirp);
-        if (state == CHIRP_CONNECT_STATE_SENDING && playBufferState == BUFFER_STATE_EMPTY)
+        chirp_sdk_state_t state = chirp_sdk_get_state(chirp);
+        if (state == CHIRP_SDK_STATE_SENDING && playBufferState == BUFFER_STATE_EMPTY)
         {
             float tmpBuffer[SHORT_BUFFER_SIZE / 2] = {0};
-            errorCode = chirp_connect_process_output(chirp, tmpBuffer, SHORT_BUFFER_SIZE / 2);
+            errorCode = chirp_sdk_process_output(chirp, tmpBuffer, SHORT_BUFFER_SIZE / 2);
             errorHandler(errorCode);
             // On the contrary of the recording part, we duplicate the data produced by the SDK
             // to create a stereo audio stream that is converted from float to int16_t samples.

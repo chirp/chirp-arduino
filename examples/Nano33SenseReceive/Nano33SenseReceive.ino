@@ -27,7 +27,7 @@
   ----------------------------------------------------------------------------*/
 #include <PDM.h>
 
-#include "chirp_connect.h"
+#include "chirp_sdk.h"
 #include "credentials.h"
 
 #define SAMPLE_RATE       16000   // Audio sample rate
@@ -35,14 +35,14 @@
 
 // Global variables ------------------------------------------------------------
 
-static chirp_connect_t *chirp = NULL;
+static chirp_sdk_t *chirp = NULL;
 short sampleBuffer[BUFFER_SIZE];
 volatile int samplesRead;
 
 // Function definitions --------------------------------------------------------
 
 void setupChirp(void);
-void chirpErrorHandler(chirp_connect_error_code_t code);
+void chirpErrorHandler(chirp_sdk_error_code_t code);
 void onPDMdata(void);
 
 // Main ------------------------------------------------------------------------
@@ -73,7 +73,7 @@ void loop()
 {
   if (samplesRead)
   {
-    chirp_connect_error_code_t err = chirp_connect_process_shorts_input(chirp, sampleBuffer, samplesRead);
+    chirp_sdk_error_code_t err = chirp_sdk_process_shorts_input(chirp, sampleBuffer, samplesRead);
     chirpErrorHandler(err);
     samplesRead = 0;
   }
@@ -109,11 +109,11 @@ void onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t ch
   }
 }
 
-void chirpErrorHandler(chirp_connect_error_code_t code)
+void chirpErrorHandler(chirp_sdk_error_code_t code)
 {
-  if (code != CHIRP_CONNECT_OK)
+  if (code != CHIRP_SDK_OK)
   {
-    const char *errorString = chirp_connect_error_code_to_string(code);
+    const char *errorString = chirp_sdk_error_code_to_string(code);
     Serial.println(errorString);
     exit(42);
   }
@@ -121,17 +121,17 @@ void chirpErrorHandler(chirp_connect_error_code_t code)
 
 void setupChirp(void)
 {
-  chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
+  chirp = new_chirp_sdk(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (chirp == NULL)
   {
     Serial.println("Chirp initialisation failed.");
     return;
   }
 
-  chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
+  chirp_sdk_error_code_t err = chirp_sdk_set_config(chirp, CHIRP_APP_CONFIG);
   chirpErrorHandler(err);
 
-  chirp_connect_callback_set_t callback_set =
+  chirp_sdk_callback_set_t callback_set =
   {
     .on_state_changed = NULL,
     .on_sending = NULL,
@@ -140,19 +140,19 @@ void setupChirp(void)
     .on_received = onReceivedCallback
   };
 
-  err = chirp_connect_set_callbacks(chirp, callback_set);
+  err = chirp_sdk_set_callbacks(chirp, callback_set);
   chirpErrorHandler(err);
 
-  err = chirp_connect_set_input_sample_rate(chirp, SAMPLE_RATE);
+  err = chirp_sdk_set_input_sample_rate(chirp, SAMPLE_RATE);
   chirpErrorHandler(err);
 
   // A fixed frequency correction coefficient is needed to correct a clock
   // mismatch between the 16000Hz requested sample rate and the Nano's actual
   // audio sample rate.
-  err = chirp_connect_set_frequency_correction(chirp, 1.00812);
+  err = chirp_sdk_set_frequency_correction(chirp, 1.00812);
   chirpErrorHandler(err);
 
-  err = chirp_connect_start(chirp);
+  err = chirp_sdk_start(chirp);
   chirpErrorHandler(err);
 
   Serial.println("Chirp SDK initialised.");
