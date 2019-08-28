@@ -51,7 +51,7 @@ File > Examples > ChirpSDK > Example
 and you can include the headers to use Chirp in your own code by adding:
 
 ```
-#include "chirp_connect.h"
+#include "chirp_sdk.h"
 ```
 
 ## Usage
@@ -62,7 +62,7 @@ secret and config from the [Developer Hub](https://developers.chirp.io).
 *Note* You must select the `16khz-mono-embedded` protocol from the dropdown menu, when
 selecting your chirp configuration.
 
-    chirp = new_chirp_connect(APP_KEY, APP_SECRET);
+    chirp = new_chirp_sdk(APP_KEY, APP_SECRET);
     if (chirp == NULL) {
         Serial.println("Chirp initialisation failed.");
         return;
@@ -70,29 +70,29 @@ selecting your chirp configuration.
 
 Then set any required callbacks and start the SDK running.
 
-    chirp_connect_error_code_t err = chirp_connect_set_config(chirp, APP_CONFIG);
-    if (err != CHIRP_CONNECT_OK)
+    chirp_sdk_error_code_t err = chirp_sdk_set_config(chirp, APP_CONFIG);
+    if (err != CHIRP_SDK_OK)
         return;
 
-    chirp_connect_callback_set_t callbacks = {0};
+    chirp_sdk_callback_set_t callbacks = {0};
     callbacks.on_received = onReceivedCallback;
-    err = chirp_connect_set_callbacks(chirp, callbacks);
-    if (err != CHIRP_CONNECT_OK)
+    err = chirp_sdk_set_callbacks(chirp, callbacks);
+    if (err != CHIRP_SDK_OK)
         return;
 
-    err = chirp_connect_set_callback_ptr(chirp, chirp);
-    if (err != CHIRP_CONNECT_OK)
+    err = chirp_sdk_set_callback_ptr(chirp, chirp);
+    if (err != CHIRP_SDK_OK)
         return;
 
-    err = chirp_connect_set_input_sample_rate(chirp, input_sample_rate);
-    if (err != CHIRP_CONNECT_OK)
+    err = chirp_sdk_set_input_sample_rate(chirp, input_sample_rate);
+    if (err != CHIRP_SDK_OK)
         return;
-    err = chirp_connect_set_output_sample_rate(chirp, output_sample_rate);
-    if (err != CHIRP_CONNECT_OK)
+    err = chirp_sdk_set_output_sample_rate(chirp, output_sample_rate);
+    if (err != CHIRP_SDK_OK)
         return;
 
-    err = chirp_connect_start(chirp);
-    if (err != CHIRP_CONNECT_OK)
+    err = chirp_sdk_start(chirp);
+    if (err != CHIRP_SDK_OK)
         return;
 
 ## Callbacks
@@ -102,9 +102,9 @@ The received data is passed back to the `onReceivedCallback` function. If the pa
     void
     onReceivedCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel) {
         if (payload) {
-            char *hexString = chirp_connect_as_string(chirp, payload, length);
+            char *hexString = chirp_sdk_as_string(chirp, payload, length);
             Serial.printf("Received data = %s\n", hexString);
-            chirp_connect_free(hexString);
+            chirp_sdk_free(hexString);
         } else {
             Serial.println("Decode failed.");
         }
@@ -112,7 +112,7 @@ The received data is passed back to the `onReceivedCallback` function. If the pa
 
 A complete list of callbacks is shown below.
 
-    void onStateChangedCallback(void *ptr, chirp_connect_state_t old_state, chirp_connect_state_t new_state) {
+    void onStateChangedCallback(void *ptr, chirp_sdk_state_t old_state, chirp_sdk_state_t new_state) {
         // Put here what you want to do when the SDK's state is changing.
     }
 
@@ -133,17 +133,17 @@ A complete list of callbacks is shown below.
     }
 
     // If you don't set all the callbacks, make sure the unused callbacks are set to NULL.
-    chirp_connect_callback_set_t callbacks_set = {
+    chirp_sdk_callback_set_t callbacks_set = {
         .on_state_changed = on_state_changed_callback,
         .on_sending = on_sending_callback,
         .on_sent = on_sent_callback,
         .on_receiving = on_receiving_callback,
         .on_received = on_received_callback
     };
-    err = chirp_connect_set_callbacks(chirp, callbacks_set);
-    if (err != CHIRP_CONNECT_OK)
+    err = chirp_sdk_set_callbacks(chirp, callbacks_set);
+    if (err != CHIRP_SDK_OK)
     {
-        const char *error_string = chirp_connect_error_code_to_string(err);
+        const char *error_string = chirp_sdk_error_code_to_string(err);
         printf("%s\n", error_string);
     }
 
@@ -152,21 +152,21 @@ A complete list of callbacks is shown below.
 
 A Chirp payload is simply an array of bytes. You can send a random data payload to the speakers like so.
 
-    size_t payload_length = chirp_connect_get_max_payload_length(chirp);
-    uint8_t *payload = chirp_connect_random_payload(chirp, &payload_length);
+    size_t payload_length = chirp_sdk_get_max_payload_length(chirp);
+    uint8_t *payload = chirp_sdk_random_payload(chirp, &payload_length);
 
-    err = chirp_connect_send(chirp, payload, payload_length);
-    if (err != CHIRP_CONNECT_OK) {
-        const char *error_string = chirp_connect_error_code_to_string(err);
+    err = chirp_sdk_send(chirp, payload, payload_length);
+    if (err != CHIRP_SDK_OK) {
+        const char *error_string = chirp_sdk_error_code_to_string(err);
         printf("%s\n", error_string);
     }
 
 Or you can easily send an ASCII string
 
     char *identifier = "hello";
-    err = chirp_connect_send(chirp, (uint8_t *)identifier, strlen(identifier));
-    if (err != CHIRP_CONNECT_OK) {
-        const char *error_string = chirp_connect_error_code_to_string(err);
+    err = chirp_sdk_send(chirp, (uint8_t *)identifier, strlen(identifier));
+    if (err != CHIRP_SDK_OK) {
+        const char *error_string = chirp_sdk_error_code_to_string(err);
         printf("%s\n", error_string);
     }
 
@@ -174,9 +174,9 @@ Or you can easily send an ASCII string
 
 To process audio data from the microphone, and fill the output buffer with audio data, call the following functions with data periodically.
 
-    err = chirp_connect_process_input(chirp, input_buffer, input_buffer_length);
+    err = chirp_sdk_process_input(chirp, input_buffer, input_buffer_length);
 
-    err = chirp_connect_process_output(chirp, output_buffer, output_buffer_length);
+    err = chirp_sdk_process_output(chirp, output_buffer, output_buffer_length);
 
 ***
 

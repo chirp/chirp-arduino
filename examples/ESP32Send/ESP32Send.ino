@@ -1,6 +1,6 @@
 /**-----------------------------------------------------------------------------
 
-    Example code using the Chirpd SDK to send data using ESP32 and UDA1334
+    Example code using the Chirp SDK to send data using ESP32 and UDA1334
     audio output
 
     @file ESP32Send.ino
@@ -21,7 +21,7 @@
   ----------------------------------------------------------------------------*/
 #include <driver/i2s.h>
 
-#include "chirp_connect.h"
+#include "chirp_sdk.h"
 #include "credentials.h"
 
 #define I2SO_DATA         23     // I2S DATA OUT on GPIO23
@@ -37,8 +37,8 @@
 
 // Global variables ------------------------------------------------------------
 
-static chirp_connect_t *chirp = NULL;
-static chirp_connect_state_t currentState = CHIRP_CONNECT_STATE_NOT_CREATED;
+static chirp_sdk_t *chirp = NULL;
+static chirp_sdk_state_t currentState = CHIRP_SDK_STATE_NOT_CREATED;
 static volatile bool buttonPressed = false;
 static bool startTasks = false;
 
@@ -46,7 +46,7 @@ static bool startTasks = false;
 
 void IRAM_ATTR handleInterrupt();
 void setupChirp();
-void chirpErrorHandler(chirp_connect_error_code_t code);
+void chirpErrorHandler(chirp_sdk_error_code_t code);
 void setupAudioOutput(int sample_rate);
 
 // Function declarations -------------------------------------------------------
@@ -67,7 +67,7 @@ void setup()
 void loop()
 {
   esp_err_t audioError;
-  chirp_connect_error_code_t chirpError;
+  chirp_sdk_error_code_t chirpError;
 
   if (startTasks)
   {
@@ -78,7 +78,7 @@ void loop()
   if (buttonPressed)
   {
     char *payload = "hello";
-    chirpError = chirp_connect_send(chirp, (uint8_t *)payload, strlen(payload));
+    chirpError = chirp_sdk_send(chirp, (uint8_t *)payload, strlen(payload));
     chirpErrorHandler(chirpError);
     Serial.print("Sending data: ");
     Serial.println(payload);
@@ -97,7 +97,7 @@ void initTask(void *parameter)
 {
   setupChirp();
 
-  uint32_t output_sample_rate = chirp_connect_set_output_sample_rate(chirp, SAMPLE_RATE);
+  uint32_t output_sample_rate = chirp_sdk_set_output_sample_rate(chirp, SAMPLE_RATE);
   setupAudioOutput(SAMPLE_RATE);
 
   Serial.printf("Heap size: %u\n", ESP.getFreeHeap());
@@ -108,15 +108,15 @@ void initTask(void *parameter)
 void processOutputTask(void *parameter)
 {
   esp_err_t audioError;
-  chirp_connect_error_code_t chirpError;
+  chirp_sdk_error_code_t chirpError;
 
   size_t bytesLength = 0;
   short buffer[BUFFER_SIZE] = {0};
   int32_t ibuffer[BUFFER_SIZE] = {0};
 
-  while (currentState >= CHIRP_CONNECT_STATE_RUNNING)
+  while (currentState >= CHIRP_SDK_STATE_RUNNING)
   {
-    chirpError = chirp_connect_process_shorts_output(chirp, buffer, BUFFER_SIZE);
+    chirpError = chirp_sdk_process_shorts_output(chirp, buffer, BUFFER_SIZE);
     chirpErrorHandler(chirpError);
 
     for (int i = 0; i < BUFFER_SIZE; i++)
@@ -130,7 +130,7 @@ void processOutputTask(void *parameter)
 
 // Chirp -----------------------------------------------------------------------
 
-void onStateChangedCallback(void *chirp, chirp_connect_state_t previous, chirp_connect_state_t current)
+void onStateChangedCallback(void *chirp, chirp_sdk_state_t previous, chirp_sdk_state_t current)
 {
   currentState = current;
   Serial.printf("State changed from %d to %d\n", previous, current);
@@ -144,49 +144,49 @@ void onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t cha
 
 void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
-  char *data = chirp_connect_as_string((chirp_connect_t *)chirp, payload, length);
+  char *data = chirp_sdk_as_string((chirp_sdk_t *)chirp, payload, length);
   Serial.printf("Send data: %s\n", data);
   digitalWrite(LED_PIN, LOW);
-  chirp_connect_free(data);
+  chirp_sdk_free(data);
 }
 
 void setupChirp()
 {
-  chirp = new_chirp_connect(CHIRP_APP_KEY, CHIRP_APP_SECRET);
+  chirp = new_chirp_sdk(CHIRP_APP_KEY, CHIRP_APP_SECRET);
   if (chirp == NULL)
   {
     Serial.println("Chirp initialisation failed.");
     return;
   }
 
-  chirp_connect_error_code_t err = chirp_connect_set_config(chirp, CHIRP_APP_CONFIG);
+  chirp_sdk_error_code_t err = chirp_sdk_set_config(chirp, CHIRP_APP_CONFIG);
   chirpErrorHandler(err);
 
-  chirp_connect_callback_set_t callbacks = {0};
+  chirp_sdk_callback_set_t callbacks = {0};
   callbacks.on_sending = onSendingCallback;
   callbacks.on_sent = onSentCallback;
   callbacks.on_state_changed = onStateChangedCallback;
 
-  err = chirp_connect_set_callbacks(chirp, callbacks);
+  err = chirp_sdk_set_callbacks(chirp, callbacks);
   chirpErrorHandler(err);
 
-  err = chirp_connect_set_callback_ptr(chirp, chirp);
+  err = chirp_sdk_set_callback_ptr(chirp, chirp);
   chirpErrorHandler(err);
 
-  err = chirp_connect_start(chirp);
+  err = chirp_sdk_start(chirp);
   chirpErrorHandler(err);
 
-  err = chirp_connect_set_volume(chirp, VOLUME);
+  err = chirp_sdk_set_volume(chirp, VOLUME);
   chirpErrorHandler(err);
 
   Serial.println("Chirp SDK initialised.");
 }
 
-void chirpErrorHandler(chirp_connect_error_code_t code)
+void chirpErrorHandler(chirp_sdk_error_code_t code)
 {
-  if (code != CHIRP_CONNECT_OK)
+  if (code != CHIRP_SDK_OK)
   {
-    const char *error_string = chirp_connect_error_code_to_string(code);
+    const char *error_string = chirp_sdk_error_code_to_string(code);
     Serial.println(error_string);
     exit(42);
   }
