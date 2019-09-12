@@ -3,7 +3,12 @@
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
 ## v3.4.0 (beta)
- - Rename ChirpConnect to ChirpSDK
+ - All functions have been renamed to `chirp_sdk*` from `chirp_connect*`
+ - `chirp_sdk_get_heap_usage` has been added. This gives you the current dynamic memory allocated and used at any time by the SDK.
+ - `chirp_connect_pause` has been removed.
+ - `chirp_connect_as_string` has been removed. You can find alternatives on our [Payload](https://developers.chirp.io/docs/using-chirp/payloads) page.
+ - `chirp_sdk_(set/get)_auto_mute` becomes `chirp_sdk_(set/get)_listen_to_self`. Be aware these are opposite meanings so don't forget to switch `true` by `false` and vice versa when updating your code.
+ - `CHIRP_SDK_MEMORY_LEAK` error code has been added and is returned by `del_chirp_sdk` when some memory leaks occur when deleting the SDK.
 
 ## v3.3.1 (22/08/2019)
  - Use high frequency oscillator in Nano 33 Sense examples
