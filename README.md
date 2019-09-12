@@ -1,6 +1,6 @@
 # Chirp for Arduino
 
-*Version 3.3.1, August 2019*
+*Version 3.4.0, September 2019*
 
 ## Overview
 
