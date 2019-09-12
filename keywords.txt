@@ -18,7 +18,6 @@ chirp_sdk_get_max_payload_length			KEYWORD2
 chirp_sdk_get_duration_for_payload_length	KEYWORD2
 chirp_sdk_is_valid			KEYWORD2
 chirp_sdk_random_payload	KEYWORD2
-chirp_sdk_as_string			KEYWORD2
 chirp_sdk_send				KEYWORD2
 chirp_sdk_process			KEYWORD2
 chirp_sdk_process_input		KEYWORD2

@@ -1,6 +1,6 @@
 /**-----------------------------------------------------------------------------
  *
- *  @file chirp_connect_version.h
+ *  @file chirp_sdk_version.h
  *
  *  @brief Provides getter to the lib name, version and build number of the
  *         library
@@ -15,22 +15,22 @@
  *
  *----------------------------------------------------------------------------*/
 
-#ifndef CHIRP_CONNECT_VERSION_H
-#define CHIRP_CONNECT_VERSION_H
+#ifndef CHIRP_SDK_VERSION_H
+#define CHIRP_SDK_VERSION_H
 
-#include "chirp_connect.h"
+#include "chirp_sdk.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * Get the name of SDK : "chirp-connect". This function doesn't rely at all on
+ * Get the name of SDK : "chirp-sdk". This function doesn't rely at all on
  * the SDK creation and can be called at any time.
  *
  * @return The name of the library
  */
-PUBLIC_SYM const char *chirp_connect_get_library_name(void);
+PUBLIC_SYM const char *chirp_sdk_get_library_name(void);
 
 /**
  * Get the version number of the SDK. This function doesn't rely at all on the
@@ -39,7 +39,7 @@ PUBLIC_SYM const char *chirp_connect_get_library_name(void);
  * @return The version number of the SDK in the MAJOR.MINOR.PATCH string
  *         representation.
  */
-PUBLIC_SYM const char *chirp_connect_get_version(void);
+PUBLIC_SYM const char *chirp_sdk_get_version(void);
 
 /**
  * Get the build number of the SDK. This function doesn't rely at all on the
@@ -47,10 +47,10 @@ PUBLIC_SYM const char *chirp_connect_get_version(void);
  *
  * @return The build number of the SDK as a string.
  */
-PUBLIC_SYM const char *chirp_connect_get_build_number(void);
+PUBLIC_SYM const char *chirp_sdk_get_build_number(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* !CHIRP_CONNECT_VERSION_H */
+#endif /* !CHIRP_SDK_VERSION_H */
