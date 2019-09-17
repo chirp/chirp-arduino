@@ -109,8 +109,8 @@ void loop()
     for (int i = 0; i < BUFFER_SIZE / 2; i++)
     {
       int value = tmpBuffer[i] * INT16_MAX;
-      buffer[next][i * 2] = value;
-      buffer[next][i * 2 + 1] = value;
+      buffer[nextBufferIndex][i * 2] = value;
+      buffer[nextBufferIndex][i * 2 + 1] = value;
     }
 
     dma_complete = false;
