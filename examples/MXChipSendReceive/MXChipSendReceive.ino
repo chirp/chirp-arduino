@@ -155,11 +155,12 @@ void on_sent_callback(void *data, uint8_t *payload, size_t length, uint8_t chann
 {
     char identifier[length * 2 + 1];
     payload_to_hex(payload, length, identifier);
-
+    char strLength[8] = {0};
+    itoa(length, strLength, 10);
     Screen.clean();
     Screen.print(0, "Sent !");
     Screen.print(1, (const char *) identifier, true);
-    Screen.print(3, strlen(identifer));
+    Screen.print(3, strLength);
     rgbLed.setColor(0, 255, 255);
 }
 
@@ -181,11 +182,12 @@ void on_received_callback(void *data, uint8_t *payload, size_t length, uint8_t c
     {
         char identifier[length * 2 + 1];
         payload_to_hex(payload, length, identifier);
-
+        char strLength[8] = {0};
+        itoa(length, strLength, 10);
         Screen.clean();
         Screen.print(0, "Received !");
         Screen.print(1, (const char *) identifier, true);
-        Screen.print(3, strlen(identifer));
+        Screen.print(3, strLength);
         rgbLed.setColor(0, 255, 0);
     }
     // A null pointer with a length of 0 means the decode has failed.
