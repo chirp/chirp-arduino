@@ -144,10 +144,11 @@ void onSendingCallback(void *chirp, uint8_t *payload, size_t length, uint8_t cha
 
 void onSentCallback(void *chirp, uint8_t *payload, size_t length, uint8_t channel)
 {
-  char *data = chirp_sdk_as_string((chirp_sdk_t *)chirp, payload, length);
+  char *data = (char *)calloc(length + 1, sizeof(uint8_t));
+  memcpy(data, payload, length * sizeof(uint8_t));
   Serial.printf("Send data: %s\n", data);
+  free(data);
   digitalWrite(LED_PIN, LOW);
-  chirp_sdk_free(data);
 }
 
 void setupChirp()
