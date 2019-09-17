@@ -87,6 +87,18 @@ int lastButtonBState;
 RGB_LED rgbLed;
 
 /*
+ * Convert a payload to an hexadecimal identifer terminating with '\0'
+ */
+void payload_to_hex(char *payload, int payload_length, char *hex_str)
+{
+    for (int i = 0; i < payload_length; i++)
+    {
+        sprintf(hex_str + i * 2, "%02x", payload[i]);
+    }
+    hex_str[payload_length * 2] = '\\0';
+}
+
+/*
  * Global pointer to the SDK structure. This is global as this pointer is
  * needed when processing the audio in the loop() function.
  */
@@ -141,17 +153,14 @@ void on_sending_callback(void *data, uint8_t *payload, size_t length, uint8_t ch
  */
 void on_sent_callback(void *data, uint8_t *payload, size_t length, uint8_t channel)
 {
-    char *identifier = chirp_sdk_as_string(chirp, payload, length);
-    char strLength[8] = {0};
-    itoa(length, strLength, 10);
+    char identifier[length * 2 + 1];
+    payload_to_hex(payload, length, identifier);
 
     Screen.clean();
     Screen.print(0, "Sent !");
     Screen.print(1, (const char *) identifier, true);
-    Screen.print(3, strLength);
+    Screen.print(3, strlen(identifer));
     rgbLed.setColor(0, 255, 255);
-
-    chirp_sdk_free(identifier);
 }
 
 /*
@@ -170,17 +179,14 @@ void on_received_callback(void *data, uint8_t *payload, size_t length, uint8_t c
     // A pointer not null with a length different than 0 means the decode has succedeed.
     if (payload && length != 0)
     {
-        char *identifier = chirp_sdk_as_string(chirp, payload, length);
-        char strLength[8] = {0};
-        itoa(length, strLength, 10);
+        char identifier[length * 2 + 1];
+        payload_to_hex(payload, length, identifier);
 
         Screen.clean();
         Screen.print(0, "Received !");
         Screen.print(1, (const char *) identifier, true);
-        Screen.print(3, strLength);
+        Screen.print(3, strlen(identifer));
         rgbLed.setColor(0, 255, 0);
-
-        chirp_sdk_free(identifier);
     }
     // A null pointer with a length of 0 means the decode has failed.
     else
@@ -216,11 +222,11 @@ void setup()
     chirp_sdk_error_code_t errorCode = chirp_sdk_set_config(chirp, CHIRP_APP_CONFIG);
     errorHandler(errorCode);
 
-    printf("Licence set correctly\n");
+    printf("Config set correctly\n");
 
     char *info = chirp_sdk_get_info(chirp);
     printf("%s - V%s\n", info, chirp_sdk_get_version());
-    free(info);
+    chirp_sdk_free(info);
 
     errorCode = chirp_sdk_set_input_sample_rate(chirp, SAMPLE_RATE);
     errorHandler(errorCode);
@@ -320,7 +326,7 @@ void loop()
             uint8_t *randomPayload =  chirp_sdk_random_payload(chirp, &randomPayloadLength);
             errorCode = chirp_sdk_send(chirp, randomPayload, randomPayloadLength);
             errorHandler(errorCode);
-            free(randomPayload);
+            chirp_sdk_free(randomPayload);
         }
 
         chirp_sdk_state_t state = chirp_sdk_get_state(chirp);
