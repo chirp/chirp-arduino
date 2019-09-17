@@ -9,6 +9,8 @@ Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
  - `chirp_connect_as_string` has been removed. You can find alternatives on our [Payload](https://developers.chirp.io/docs/using-chirp/payloads) page.
  - `chirp_sdk_(set/get)_auto_mute` becomes `chirp_sdk_(set/get)_listen_to_self`. Be aware these are opposite meanings so don't forget to switch `true` by `false` and vice versa when updating your code.
  - `CHIRP_SDK_MEMORY_LEAK` error code has been added and is returned by `del_chirp_sdk` when some memory leaks occur when deleting the SDK.
+ - `CHIRP_SDK_RECEIVING_NOT_AVAILABLE` error code has been added and is returned when trying to use decoding features with a library which is send only.
+ - Core build v3.3.1
 
 ## v3.3.1 (22/08/2019)
  - Use high frequency oscillator in Nano 33 Sense examples
