@@ -95,7 +95,7 @@ void payload_to_hex(char *payload, int payload_length, char *hex_str)
     {
         sprintf(hex_str + i * 2, "%02x", payload[i]);
     }
-    hex_str[payload_length * 2] = '\\0';
+    hex_str[payload_length * 2] = '\0';
 }
 
 /*
@@ -154,7 +154,7 @@ void on_sending_callback(void *data, uint8_t *payload, size_t length, uint8_t ch
 void on_sent_callback(void *data, uint8_t *payload, size_t length, uint8_t channel)
 {
     char identifier[length * 2 + 1];
-    payload_to_hex(payload, length, identifier);
+    payload_to_hex((char *) payload, length, identifier);
     char strLength[8] = {0};
     itoa(length, strLength, 10);
     Screen.clean();
@@ -181,7 +181,7 @@ void on_received_callback(void *data, uint8_t *payload, size_t length, uint8_t c
     if (payload && length != 0)
     {
         char identifier[length * 2 + 1];
-        payload_to_hex(payload, length, identifier);
+        payload_to_hex((char *) payload, length, identifier);
         char strLength[8] = {0};
         itoa(length, strLength, 10);
         Screen.clean();
@@ -227,7 +227,7 @@ void setup()
     printf("Config set correctly\n");
 
     char *info = chirp_sdk_get_info(chirp);
-    printf("%s - V%s\n", info, chirp_sdk_get_version());
+    printf("%s - V%s [%s]\n", info, chirp_sdk_get_version(), chirp_sdk_get_build_number());
     chirp_sdk_free(info);
 
     errorCode = chirp_sdk_set_input_sample_rate(chirp, SAMPLE_RATE);
@@ -261,7 +261,7 @@ void setup()
     printf("SDK started\n");
 
     Screen.clean();
-    Screen.print(0, "Chirp C SDK");
+    Screen.print(0, "Chirp Arduino");
     Screen.print(1, "Listening ...");
 
     // Setup the audio class and start recording.
