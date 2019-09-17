@@ -156,5 +156,7 @@ void setupChirp(void)
   chirpErrorHandler(err);
 
   Serial.println("Chirp SDK initialised.");
+  Serial.println(chirp_sdk_get_version());
+  Serial.println(chirp_sdk_get_build_number());
   Serial.flush();
 }
