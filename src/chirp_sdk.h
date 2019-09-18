@@ -68,7 +68,19 @@ PUBLIC_SYM chirp_sdk_t *new_chirp_sdk(const char *key, const char *secret);
 PUBLIC_SYM chirp_sdk_error_code_t del_chirp_sdk(chirp_sdk_t **sdk);
 
 /**
- * Free some memory previously allocated and returned by the SDK.
+ * Free memory previously allocated and returned by the SDK.
+ *
+ * Note that this does not free the SDK itself. For this, use `del_chirp_sdk`
+ * above.
+ *
+ * This function should be called to free the memory returned by the
+ * following functions:
+ *
+ *   `chirp_sdk_get_info`
+ *   `chirp_sdk_random_payload`
+ *
+ * As well as freeing the memory, this function tracks the ongoing heap
+ * allocation which can be queried with `chirp_sdk_get_heap_usage`.
  *
  * @param ptr The pointer to the memory to be freed.
  */
