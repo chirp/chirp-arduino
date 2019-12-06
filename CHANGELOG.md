@@ -2,6 +2,9 @@
 
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
+## v3.4.1 (beta)
+ - Add support for Teensy boards (cortex-m4 hard float build)
+
 ## v3.4.0 (18/09/2019)
  - All functions have been renamed to `chirp_sdk*` from `chirp_connect*`
  - `chirp_sdk_get_heap_usage` has been added. This gives you the current dynamic memory allocated and used at any time by the SDK.
