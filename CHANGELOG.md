@@ -2,7 +2,7 @@
 
 Recent changes to the [Chirp Arduino SDK](https://developers.chirp.io/docs).
 
-## v3.4.1 (beta)
+## v3.4.1 (09/12/2019)
  - Add support for Teensy boards (cortex-m4 hard float build)
 
 ## v3.4.0 (18/09/2019)
